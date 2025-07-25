@@ -44,16 +44,14 @@ export default function Widget() {
       console.log("call ended");
       setCallStatus('Call Ended');
       setIsCallActive(false);
-      setShowEndScreen(true);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
       setTimeout(() => {
         setCallStatus('Call Gabbi');
         setShowMessages(false);
-        setShowEndScreen(false);
         setMessages([]);
-      }, 4000);
+      }, 3000);
     });
 
     client.on("update", (update) => {
@@ -73,15 +71,13 @@ export default function Widget() {
     client.on("error", (error) => {
       console.error("Retell error:", error);
       setCallStatus('Call Failed');
-      setShowEndScreen(true);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
       setTimeout(() => {
         setCallStatus('Call Gabbi');
         setShowMessages(false);
-        setShowEndScreen(false);
-      }, 4000);
+      }, 3000);
     });
 
     return () => {
@@ -154,10 +150,10 @@ export default function Widget() {
 
   return (
     <>
-      <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       
       <div style={{
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, sans-serif",
         background: 'transparent',
         display: 'flex',
         alignItems: 'center',
@@ -206,7 +202,7 @@ export default function Widget() {
               </div>
             </div>
 
-            {!isCallActive && !showMessages && !showEndScreen ? (
+            {!isCallActive && !showMessages ? (
               /* Contact Screen */
               <div style={{
                 padding: '20px',
@@ -249,169 +245,75 @@ export default function Widget() {
 
                 {/* Contact Name */}
                 <h2 style={{
-                  fontSize: '32px',
-                  fontWeight: '600',
+                  fontSize: '36px',
+                  fontWeight: '800',
                   color: '#000000',
                   marginBottom: '8px',
-                  letterSpacing: '-0.5px',
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
+                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                 }}>
-                  Gabbi
+                  GABBI
                 </h2>
 
                 {/* Contact Subtitle */}
                 <p style={{
-                  fontSize: '18px',
+                  fontSize: '17px',
                   color: '#8e8e93',
-                  marginBottom: '40px',
-                  fontWeight: '400',
+                  marginBottom: '50px',
+                  fontWeight: '500',
+                  lineHeight: '1.3',
+                  textAlign: 'center',
                 }}>
-                  AI Legal Assistant
+                  Your Next AI Intake Employee
                 </p>
 
                 {/* Call Button */}
                 <div 
                   onClick={startCall}
                   style={{
-                    width: '80px',
-                    height: '80px',
+                    width: '90px',
+                    height: '90px',
                     borderRadius: '50%',
                     background: 'linear-gradient(135deg, #34c759, #30d158)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: '0 8px 25px rgba(52, 199, 89, 0.4)',
-                    marginBottom: '20px',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 15px 35px rgba(52, 199, 89, 0.5), 0 0 0 0 rgba(52, 199, 89, 0.4)',
+                    marginBottom: '25px',
+                    animation: 'callButtonPulse 3s ease-in-out infinite',
+                    position: 'relative',
                   }}
-                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
-                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.15)';
+                    e.target.style.boxShadow = '0 20px 45px rgba(52, 199, 89, 0.7), 0 0 30px rgba(52, 199, 89, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1)';
+                    e.target.style.boxShadow = '0 15px 35px rgba(52, 199, 89, 0.5), 0 0 0 0 rgba(52, 199, 89, 0.4)';
+                  }}
                 >
                   <div style={{
-                    fontSize: '32px',
+                    fontSize: '38px',
                     color: '#ffffff',
+                    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
                   }}>
                     📞
                   </div>
                 </div>
 
                 <div style={{
-                  fontSize: '17px',
+                  fontSize: '20px',
                   color: '#34c759',
-                  fontWeight: '500',
-                }}>
-                  {callStatus}
-                </div>
-              </div>
-            ) : showEndScreen ? (
-              /* Call Ended Screen */
-              <div style={{
-                padding: '40px 20px',
-                textAlign: 'center',
-                height: 'calc(100% - 44px)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                background: 'linear-gradient(180deg, #f8f9fa, #ffffff)',
-              }}>
-                {/* Meet Gabbi Logo */}
-                <div style={{
-                  width: '120px',
-                  height: '120px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #4fc3f7, #29b6f6, #0288d1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '30px',
-                  boxShadow: '0 15px 40px rgba(41, 182, 246, 0.25)',
-                  border: '4px solid rgba(255, 255, 255, 0.9)',
-                  overflow: 'hidden',
-                  animation: 'endScreenFadeIn 0.8s ease-out',
-                }}>
-                  <img 
-                    src="https://chatdash-bucket.s3.us-east-1.amazonaws.com/685c4a3871002e3108e5194d_project_logo?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARHJJM3SY5CUVGPJG%2F20250725%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250725T231113Z&X-Amz-Expires=3600&X-Amz-Signature=f8d55c69357685cd9b673b0d171a4b124a824c7313e44cbd2fc6bc4c8e7ab728&X-Amz-SignedHeaders=host&x-id=GetObject"
-                    alt="Meet Gabbi Logo"
-                    style={{
-                      width: '90px',
-                      height: '90px',
-                      objectFit: 'contain',
-                      borderRadius: '50%',
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.parentNode.innerHTML = '<div style="font-size: 50px; color: white;">👩‍⚖️</div>';
-                    }}
-                  />
-                </div>
-
-                {/* Thank You Message */}
-                <h2 style={{
-                  fontSize: '26px',
-                  fontWeight: '600',
-                  color: '#1c1c1e',
-                  marginBottom: '12px',
-                  letterSpacing: '-0.5px',
-                  animation: 'endScreenFadeIn 0.8s ease-out 0.2s both',
-                }}>
-                  It was great chatting with you!
-                </h2>
-
-                {/* Subtitle */}
-                <p style={{
-                  fontSize: '17px',
-                  color: '#8e8e93',
-                  lineHeight: '1.4',
-                  fontWeight: '400',
-                  marginBottom: '40px',
-                  animation: 'endScreenFadeIn 0.8s ease-out 0.4s both',
-                }}>
-                  Thanks for connecting with Gabbi.<br/>
-                  Feel free to call again anytime!
-                </p>
-
-                {/* Decorative Element */}
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  marginBottom: '20px',
-                  animation: 'endScreenFadeIn 0.8s ease-out 0.6s both',
-                }}>
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #4fc3f7, #29b6f6)',
-                    animation: 'sparkle 2s ease-in-out infinite',
-                  }}></div>
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #4fc3f7, #29b6f6)',
-                    animation: 'sparkle 2s ease-in-out infinite 0.3s',
-                  }}></div>
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #4fc3f7, #29b6f6)',
-                    animation: 'sparkle 2s ease-in-out infinite 0.6s',
-                  }}></div>
-                </div>
-
-                {/* Powered by */}
-                <div style={{
-                  fontSize: '13px',
-                  color: '#c7c7cc',
-                  fontWeight: '500',
+                  fontWeight: '700',
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
-                  animation: 'endScreenFadeIn 0.8s ease-out 0.8s both',
+                  textShadow: '0 2px 8px rgba(52, 199, 89, 0.3)',
+                  animation: 'callTextGlow 2s ease-in-out infinite alternate',
                 }}>
-                  Powered by Meet Gabbi
+                  {callStatus}
                 </div>
               </div>
             ) : (
@@ -460,12 +362,15 @@ export default function Widget() {
                       </div>
                       
                       <h3 style={{
-                        fontSize: '24px',
-                        fontWeight: '600',
+                        fontSize: '26px',
+                        fontWeight: '800',
                         marginBottom: '4px',
                         color: '#ffffff',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                        textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
                       }}>
-                        Gabbi
+                        GABBI
                       </h3>
                       
                       <div style={{
@@ -611,36 +516,33 @@ export default function Widget() {
         </div>
 
         <style jsx>{`
-          @keyframes callPulse {
+          @keyframes callButtonPulse {
             0%, 100% {
               transform: scale(1);
-              opacity: 1;
+              box-shadow: 0 15px 35px rgba(52, 199, 89, 0.5), 0 0 0 0 rgba(52, 199, 89, 0.4);
             }
-            50% {
+            25% {
               transform: scale(1.05);
-              opacity: 0.8;
-            }
-          }
-
-          @keyframes sparkle {
-            0%, 100% {
-              opacity: 0.3;
-              transform: scale(1);
+              box-shadow: 0 20px 40px rgba(52, 199, 89, 0.6), 0 0 15px rgba(52, 199, 89, 0.5);
             }
             50% {
-              opacity: 1;
-              transform: scale(1.2);
+              transform: scale(1.08);
+              box-shadow: 0 25px 45px rgba(52, 199, 89, 0.7), 0 0 25px rgba(52, 199, 89, 0.6);
+            }
+            75% {
+              transform: scale(1.05);
+              box-shadow: 0 20px 40px rgba(52, 199, 89, 0.6), 0 0 15px rgba(52, 199, 89, 0.5);
             }
           }
 
-          @keyframes endScreenFadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(20px);
+          @keyframes callTextGlow {
+            0% {
+              text-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
+              color: #34c759;
             }
-            to {
-              opacity: 1;
-              transform: translateY(0);
+            100% {
+              text-shadow: 0 4px 16px rgba(52, 199, 89, 0.6), 0 0 8px rgba(52, 199, 89, 0.4);
+              color: #30d158;
             }
           }
 
