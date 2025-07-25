@@ -10,7 +10,7 @@ export default function Widget() {
   const [retellWebClient, setRetellWebClient] = useState(null);
   const [messages, setMessages] = useState([]);
   const [showMessages, setShowMessages] = useState(false);
-  const [callDuration, setCallDuration] = useState(0);
+  const [showEndScreen, setShowEndScreen] = useState(false);
   const messagesEndRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -44,14 +44,16 @@ export default function Widget() {
       console.log("call ended");
       setCallStatus('Call Ended');
       setIsCallActive(false);
+      setShowEndScreen(true);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
       setTimeout(() => {
         setCallStatus('Call Gabbi');
         setShowMessages(false);
+        setShowEndScreen(false);
         setMessages([]);
-      }, 3000);
+      }, 4000);
     });
 
     client.on("update", (update) => {
@@ -71,13 +73,15 @@ export default function Widget() {
     client.on("error", (error) => {
       console.error("Retell error:", error);
       setCallStatus('Call Failed');
+      setShowEndScreen(true);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
       setTimeout(() => {
         setCallStatus('Call Gabbi');
         setShowMessages(false);
-      }, 3000);
+        setShowEndScreen(false);
+      }, 4000);
     });
 
     return () => {
@@ -202,7 +206,7 @@ export default function Widget() {
               </div>
             </div>
 
-            {!isCallActive && !showMessages ? (
+            {!isCallActive && !showMessages && !showEndScreen ? (
               /* Contact Screen */
               <div style={{
                 padding: '20px',
@@ -222,12 +226,25 @@ export default function Widget() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '60px',
                   marginBottom: '20px',
                   boxShadow: '0 10px 30px rgba(41, 182, 246, 0.3)',
                   border: '4px solid rgba(255, 255, 255, 0.8)',
+                  overflow: 'hidden',
                 }}>
-                  👩‍⚖️
+                  <img 
+                    src="https://chatdash-bucket.s3.us-east-1.amazonaws.com/685c4a3871002e3108e5194d_project_logo?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARHJJM3SY5CUVGPJG%2F20250725%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250725T231113Z&X-Amz-Expires=3600&X-Amz-Signature=f8d55c69357685cd9b673b0d171a4b124a824c7313e44cbd2fc6bc4c8e7ab728&X-Amz-SignedHeaders=host&x-id=GetObject"
+                    alt="Meet Gabbi Logo"
+                    style={{
+                      width: '100px',
+                      height: '100px',
+                      objectFit: 'contain',
+                      borderRadius: '50%',
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.parentNode.innerHTML = '<div style="font-size: 60px; color: white;">👩‍⚖️</div>';
+                    }}
+                  />
                 </div>
 
                 {/* Contact Name */}
@@ -286,6 +303,117 @@ export default function Widget() {
                   {callStatus}
                 </div>
               </div>
+            ) : showEndScreen ? (
+              /* Call Ended Screen */
+              <div style={{
+                padding: '40px 20px',
+                textAlign: 'center',
+                height: 'calc(100% - 44px)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                background: 'linear-gradient(180deg, #f8f9fa, #ffffff)',
+              }}>
+                {/* Meet Gabbi Logo */}
+                <div style={{
+                  width: '120px',
+                  height: '120px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #4fc3f7, #29b6f6, #0288d1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '30px',
+                  boxShadow: '0 15px 40px rgba(41, 182, 246, 0.25)',
+                  border: '4px solid rgba(255, 255, 255, 0.9)',
+                  overflow: 'hidden',
+                  animation: 'endScreenFadeIn 0.8s ease-out',
+                }}>
+                  <img 
+                    src="https://chatdash-bucket.s3.us-east-1.amazonaws.com/685c4a3871002e3108e5194d_project_logo?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARHJJM3SY5CUVGPJG%2F20250725%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250725T231113Z&X-Amz-Expires=3600&X-Amz-Signature=f8d55c69357685cd9b673b0d171a4b124a824c7313e44cbd2fc6bc4c8e7ab728&X-Amz-SignedHeaders=host&x-id=GetObject"
+                    alt="Meet Gabbi Logo"
+                    style={{
+                      width: '90px',
+                      height: '90px',
+                      objectFit: 'contain',
+                      borderRadius: '50%',
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.parentNode.innerHTML = '<div style="font-size: 50px; color: white;">👩‍⚖️</div>';
+                    }}
+                  />
+                </div>
+
+                {/* Thank You Message */}
+                <h2 style={{
+                  fontSize: '26px',
+                  fontWeight: '600',
+                  color: '#1c1c1e',
+                  marginBottom: '12px',
+                  letterSpacing: '-0.5px',
+                  animation: 'endScreenFadeIn 0.8s ease-out 0.2s both',
+                }}>
+                  It was great chatting with you!
+                </h2>
+
+                {/* Subtitle */}
+                <p style={{
+                  fontSize: '17px',
+                  color: '#8e8e93',
+                  lineHeight: '1.4',
+                  fontWeight: '400',
+                  marginBottom: '40px',
+                  animation: 'endScreenFadeIn 0.8s ease-out 0.4s both',
+                }}>
+                  Thanks for connecting with Gabbi.<br/>
+                  Feel free to call again anytime!
+                </p>
+
+                {/* Decorative Element */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginBottom: '20px',
+                  animation: 'endScreenFadeIn 0.8s ease-out 0.6s both',
+                }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #4fc3f7, #29b6f6)',
+                    animation: 'sparkle 2s ease-in-out infinite',
+                  }}></div>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #4fc3f7, #29b6f6)',
+                    animation: 'sparkle 2s ease-in-out infinite 0.3s',
+                  }}></div>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #4fc3f7, #29b6f6)',
+                    animation: 'sparkle 2s ease-in-out infinite 0.6s',
+                  }}></div>
+                </div>
+
+                {/* Powered by */}
+                <div style={{
+                  fontSize: '13px',
+                  color: '#c7c7cc',
+                  fontWeight: '500',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  animation: 'endScreenFadeIn 0.8s ease-out 0.8s both',
+                }}>
+                  Powered by Meet Gabbi
+                </div>
+              </div>
             ) : (
               /* Call Active Screen */
               <div style={{
@@ -310,11 +438,25 @@ export default function Widget() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '45px',
                         margin: '0 auto 15px',
                         animation: 'callPulse 2s ease-in-out infinite',
+                        overflow: 'hidden',
+                        border: '3px solid rgba(255, 255, 255, 0.3)',
                       }}>
-                        👩‍⚖️
+                        <img 
+                          src="https://chatdash-bucket.s3.us-east-1.amazonaws.com/685c4a3871002e3108e5194d_project_logo?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARHJJM3SY5CUVGPJG%2F20250725%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250725T231113Z&X-Amz-Expires=3600&X-Amz-Signature=f8d55c69357685cd9b673b0d171a4b124a824c7313e44cbd2fc6bc4c8e7ab728&X-Amz-SignedHeaders=host&x-id=GetObject"
+                          alt="Meet Gabbi Logo"
+                          style={{
+                            width: '70px',
+                            height: '70px',
+                            objectFit: 'contain',
+                            borderRadius: '50%',
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.parentNode.innerHTML = '<div style="font-size: 45px; color: white;">👩‍⚖️</div>';
+                          }}
+                        />
                       </div>
                       
                       <h3 style={{
@@ -480,10 +622,21 @@ export default function Widget() {
             }
           }
 
-          @keyframes messageSlideIn {
+          @keyframes sparkle {
+            0%, 100% {
+              opacity: 0.3;
+              transform: scale(1);
+            }
+            50% {
+              opacity: 1;
+              transform: scale(1.2);
+            }
+          }
+
+          @keyframes endScreenFadeIn {
             from {
               opacity: 0;
-              transform: translateY(10px);
+              transform: translateY(20px);
             }
             to {
               opacity: 1;
