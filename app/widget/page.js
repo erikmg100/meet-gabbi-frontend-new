@@ -133,6 +133,13 @@ export default function Widget() {
       if (retellWebClient) {
         await retellWebClient.stopCall();
       }
+      setCallStatus('Call Ended');
+      setIsCallActive(false);
+      setTimeout(() => {
+        setCallStatus('Call Gabbi');
+        setShowMessages(false);
+        setMessages([]);
+      }, 2000);
     } catch (error) {
       console.error('Error stopping call:', error);
     }
