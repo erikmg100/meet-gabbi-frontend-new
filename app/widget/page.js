@@ -10,7 +10,7 @@ export default function Widget() {
   const [retellWebClient, setRetellWebClient] = useState(null);
   const [messages, setMessages] = useState([]);
   const [showMessages, setShowMessages] = useState(false);
-  const [showEndScreen, setShowEndScreen] = useState(false);
+  const [callDuration, setCallDuration] = useState(0);
   const messagesEndRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -133,13 +133,6 @@ export default function Widget() {
       if (retellWebClient) {
         await retellWebClient.stopCall();
       }
-      setCallStatus('Call Ended');
-      setIsCallActive(false);
-      setTimeout(() => {
-        setCallStatus('Call Gabbi');
-        setShowMessages(false);
-        setMessages([]);
-      }, 2000);
     } catch (error) {
       console.error('Error stopping call:', error);
     }
@@ -523,6 +516,17 @@ export default function Widget() {
         </div>
 
         <style jsx>{`
+          @keyframes callPulse {
+            0%, 100% {
+              transform: scale(1);
+              opacity: 1;
+            }
+            50% {
+              transform: scale(1.05);
+              opacity: 0.8;
+            }
+          }
+
           @keyframes callButtonPulse {
             0%, 100% {
               transform: scale(1);
@@ -550,6 +554,17 @@ export default function Widget() {
             100% {
               text-shadow: 0 4px 16px rgba(52, 199, 89, 0.6), 0 0 8px rgba(52, 199, 89, 0.4);
               color: #30d158;
+            }
+          }
+
+          @keyframes messageSlideIn {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
             }
           }
 
