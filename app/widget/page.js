@@ -201,7 +201,9 @@ export default function Widget() {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '20px',
-        minHeight: '700px',
+        height: '700px', // Fixed container height
+        maxHeight: '700px', // Lock max height
+        minHeight: '700px', // Lock min height
         position: 'relative',
         overflow: 'hidden',
       }}>
@@ -410,9 +412,10 @@ export default function Widget() {
                   <>
                     {/* Call Header */}
                     <div style={{
-                      padding: '30px 20px 20px',
+                      padding: '20px 20px 15px', // Reduced padding
                       textAlign: 'center',
                       color: '#ffffff',
+                      flexShrink: 0, // Don't let this shrink
                     }}>
                       <div style={{
                         width: '100px',
@@ -480,9 +483,9 @@ export default function Widget() {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '8px',
-                      height: '200px', // Fixed height to prevent page pushing
-                      maxHeight: '200px', // Enforce max height
-                      minHeight: '200px', // Enforce min height
+                      height: '180px', // Smaller fixed height
+                      maxHeight: '180px', // Enforce max height
+                      minHeight: '180px', // Enforce min height
                     }}>
                       {messages.map((message, index) => (
                         <div key={index} style={{
@@ -536,11 +539,12 @@ export default function Widget() {
 
                     {/* Call Controls */}
                     <div style={{
-                      padding: '20px',
+                      padding: '15px', // Reduced padding
                       display: 'flex',
                       justifyContent: 'center',
                       gap: '60px',
                       alignItems: 'center',
+                      flexShrink: 0, // Don't let this shrink
                     }}>
                       {/* End Call Button */}
                       <div 
