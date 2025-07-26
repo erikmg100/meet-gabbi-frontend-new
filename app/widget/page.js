@@ -289,33 +289,42 @@ export default function Widget() {
                     width: '90px',
                     height: '90px',
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #34c759, #30d158)',
+                    background: 'linear-gradient(135deg, #00E676, #00C853, #00B248)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    boxShadow: '0 15px 35px rgba(52, 199, 89, 0.5), 0 0 0 0 rgba(52, 199, 89, 0.4)',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 20px 40px rgba(0, 230, 118, 0.4), 0 0 0 0 rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
                     marginBottom: '25px',
-                    animation: 'callButtonPulse 3s ease-in-out infinite',
+                    animation: 'modernCallPulse 3s ease-in-out infinite',
                     position: 'relative',
+                    border: '3px solid rgba(255, 255, 255, 0.15)',
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.transform = 'scale(1.15)';
-                    e.target.style.boxShadow = '0 20px 45px rgba(52, 199, 89, 0.7), 0 0 30px rgba(52, 199, 89, 0.6)';
+                    e.target.style.transform = 'scale(1.15) translateY(-2px)';
+                    e.target.style.boxShadow = '0 25px 50px rgba(0, 230, 118, 0.6), 0 0 40px rgba(0, 230, 118, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3)';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.transform = 'scale(1)';
-                    e.target.style.boxShadow = '0 15px 35px rgba(52, 199, 89, 0.5), 0 0 0 0 rgba(52, 199, 89, 0.4)';
+                    e.target.style.transform = 'scale(1) translateY(0px)';
+                    e.target.style.boxShadow = '0 20px 40px rgba(0, 230, 118, 0.4), 0 0 0 0 rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)';
                   }}
                 >
-                  <div style={{
-                    fontSize: '38px',
-                    color: '#ffffff',
-                    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
-                  }}>
-                    📞
-                  </div>
+                  {/* Modern phone icon */}
+                  <svg
+                    width="36"
+                    height="36"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style={{
+                      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
+                    }}
+                  >
+                    <path
+                      d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                      fill="white"
+                    />
+                  </svg>
                 </div>
 
                 <div style={{
@@ -478,23 +487,40 @@ export default function Widget() {
                           width: '70px',
                           height: '70px',
                           borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #ff3b30, #ff453a)',
+                          background: 'linear-gradient(135deg, #FF3B30, #FF453A, #D70015)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          boxShadow: '0 8px 25px rgba(255, 59, 48, 0.4)',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          boxShadow: '0 15px 30px rgba(255, 59, 48, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+                          border: '2px solid rgba(255, 255, 255, 0.15)',
                         }}
-                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                        onMouseEnter={(e) => {
+                          e.target.style.transform = 'scale(1.1) translateY(-2px)';
+                          e.target.style.boxShadow = '0 20px 40px rgba(255, 59, 48, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.3)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.transform = 'scale(1) translateY(0px)';
+                          e.target.style.boxShadow = '0 15px 30px rgba(255, 59, 48, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2)';
+                        }}
                       >
-                        <div style={{
-                          fontSize: '28px',
-                          color: '#ffffff',
-                        }}>
-                          📞
-                        </div>
+                        {/* Modern phone hangup icon */}
+                        <svg
+                          width="26"
+                          height="26"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          style={{
+                            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
+                            transform: 'rotate(135deg)',
+                          }}
+                        >
+                          <path
+                            d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                            fill="white"
+                          />
+                        </svg>
                       </div>
                     </div>
                   </>
