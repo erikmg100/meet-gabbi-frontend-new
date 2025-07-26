@@ -294,20 +294,11 @@ export default function Widget() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     boxShadow: '0 20px 40px rgba(0, 230, 118, 0.4), 0 0 30px rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
                     marginBottom: '25px',
                     animation: 'modernCallPulse 3s ease-in-out infinite',
                     position: 'relative',
                     border: '3px solid rgba(255, 255, 255, 0.15)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'scale(1.1)';
-                    e.target.style.animation = 'none';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'scale(1)';
-                    e.target.style.animation = 'modernCallPulse 3s ease-in-out infinite';
                   }}
                 >
                   {/* Glowing ring animation */}
