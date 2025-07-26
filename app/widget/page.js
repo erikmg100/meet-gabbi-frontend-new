@@ -13,6 +13,16 @@ export default function Widget() {
   const [callDuration, setCallDuration] = useState(0);
   const messagesEndRef = useRef(null);
   const intervalRef = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    // Trigger fade-in animation after component mounts
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     // Trigger fade-in animation after component mounts
