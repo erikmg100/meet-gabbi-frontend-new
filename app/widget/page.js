@@ -12,7 +12,16 @@ export default function Widget() {
   const [showMessages, setShowMessages] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const messagesEndRef = useRef(null);
-  const intervalRef = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    // Trigger fade-in animation after component mounts
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -161,7 +170,7 @@ export default function Widget() {
         padding: '20px',
         minHeight: '700px',
       }}>
-        {/* iPhone Frame */}
+        {        /* iPhone Frame */}
         <div style={{
           width: '320px',
           height: '640px',
@@ -171,6 +180,9 @@ export default function Widget() {
           boxShadow: '0 25px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
           position: 'relative',
           border: '2px solid #3a3a3c',
+          opacity: isLoaded ? 1 : 0,
+          transform: isLoaded ? 'translateY(0px) scale(1)' : 'translateY(30px) scale(0.95)',
+          transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
         }}>
           {/* iPhone Screen */}
           <div style={{
@@ -180,6 +192,8 @@ export default function Widget() {
             borderRadius: '37px',
             overflow: 'hidden',
             position: 'relative',
+            opacity: isLoaded ? 1 : 0,
+            transition: 'opacity 0.6s ease 0.3s',
           }}>
             
             {/* Status Bar */}
@@ -228,7 +242,7 @@ export default function Widget() {
                   overflow: 'hidden',
                 }}>
                   <img 
-                    src="https://chatdash-bucket.s3.us-east-1.amazonaws.com/685c4a3871002e3108e5194d_project_logo?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARHJJM3SY5CUVGPJG%2F20250725%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250725T231113Z&X-Amz-Expires=3600&X-Amz-Signature=f8d55c69357685cd9b673b0d171a4b124a824c7313e44cbd2fc6bc4c8e7ab728&X-Amz-SignedHeaders=host&x-id=GetObject"
+                    src="https://storage.googleapis.com/msgsndr/Gyvgsd99IT2dSJS5bwiK/media/6884ce07546316a66b110f2e.jpeg"
                     alt="Meet Gabbi Logo"
                     style={{
                       width: '100px',
@@ -346,7 +360,7 @@ export default function Widget() {
                         border: '3px solid rgba(255, 255, 255, 0.3)',
                       }}>
                         <img 
-                          src="https://chatdash-bucket.s3.us-east-1.amazonaws.com/685c4a3871002e3108e5194d_project_logo?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARHJJM3SY5CUVGPJG%2F20250725%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250725T231113Z&X-Amz-Expires=3600&X-Amz-Signature=f8d55c69357685cd9b673b0d171a4b124a824c7313e44cbd2fc6bc4c8e7ab728&X-Amz-SignedHeaders=host&x-id=GetObject"
+                          src="https://storage.googleapis.com/msgsndr/Gyvgsd99IT2dSJS5bwiK/media/6884ce07546316a66b110f2e.jpeg"
                           alt="Meet Gabbi Logo"
                           style={{
                             width: '70px',
