@@ -295,19 +295,19 @@ export default function Widget() {
                     justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: '0 20px 40px rgba(0, 230, 118, 0.4), 0 0 0 0 rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+                    boxShadow: '0 20px 40px rgba(0, 230, 118, 0.4), 0 0 30px rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
                     marginBottom: '25px',
                     animation: 'modernCallPulse 3s ease-in-out infinite',
                     position: 'relative',
                     border: '3px solid rgba(255, 255, 255, 0.15)',
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.transform = 'scale(1.15) translateY(-2px)';
-                    e.target.style.boxShadow = '0 25px 50px rgba(0, 230, 118, 0.6), 0 0 40px rgba(0, 230, 118, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3)';
+                    e.target.style.transform = 'scale(1.1)';
+                    e.target.style.animation = 'none';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.transform = 'scale(1) translateY(0px)';
-                    e.target.style.boxShadow = '0 20px 40px rgba(0, 230, 118, 0.4), 0 0 0 0 rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)';
+                    e.target.style.transform = 'scale(1)';
+                    e.target.style.animation = 'modernCallPulse 3s ease-in-out infinite';
                   }}
                 >
                   {/* Glowing ring animation */}
@@ -321,6 +321,7 @@ export default function Widget() {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
+                    pointerEvents: 'none',
                   }}></div>
                   
                   {/* Second glowing ring */}
@@ -334,6 +335,7 @@ export default function Widget() {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
+                    pointerEvents: 'none',
                   }}></div>
 
                   {/* Modern phone icon */}
@@ -346,6 +348,7 @@ export default function Widget() {
                       filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
                       position: 'relative',
                       zIndex: 2,
+                      pointerEvents: 'none',
                     }}
                   >
                     <path
