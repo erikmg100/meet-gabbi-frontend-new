@@ -310,6 +310,32 @@ export default function Widget() {
                     e.target.style.boxShadow = '0 20px 40px rgba(0, 230, 118, 0.4), 0 0 0 0 rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)';
                   }}
                 >
+                  {/* Glowing ring animation */}
+                  <div style={{
+                    position: 'absolute',
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
+                    border: '2px solid rgba(0, 230, 118, 0.4)',
+                    animation: 'glowRing 2s ease-in-out infinite',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                  }}></div>
+                  
+                  {/* Second glowing ring */}
+                  <div style={{
+                    position: 'absolute',
+                    width: '140px',
+                    height: '140px',
+                    borderRadius: '50%',
+                    border: '1px solid rgba(0, 230, 118, 0.2)',
+                    animation: 'glowRing 2s ease-in-out infinite 0.5s',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                  }}></div>
+
                   {/* Modern phone icon */}
                   <svg
                     width="36"
@@ -318,6 +344,8 @@ export default function Widget() {
                     fill="none"
                     style={{
                       filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
+                      position: 'relative',
+                      zIndex: 2,
                     }}
                   >
                     <path
@@ -567,22 +595,22 @@ export default function Widget() {
             }
           }
 
-          @keyframes callButtonPulse {
+          @keyframes modernCallPulse {
             0%, 100% {
               transform: scale(1);
-              box-shadow: 0 15px 35px rgba(52, 199, 89, 0.5), 0 0 0 0 rgba(52, 199, 89, 0.4);
+              box-shadow: 0 20px 40px rgba(0, 230, 118, 0.4), 0 0 0 0 rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2);
             }
             25% {
-              transform: scale(1.05);
-              box-shadow: 0 20px 40px rgba(52, 199, 89, 0.6), 0 0 15px rgba(52, 199, 89, 0.5);
+              transform: scale(1.03);
+              box-shadow: 0 25px 45px rgba(0, 230, 118, 0.5), 0 0 20px rgba(0, 230, 118, 0.4), inset 0 3px 0 rgba(255, 255, 255, 0.25);
             }
             50% {
-              transform: scale(1.08);
-              box-shadow: 0 25px 45px rgba(52, 199, 89, 0.7), 0 0 25px rgba(52, 199, 89, 0.6);
+              transform: scale(1.06);
+              box-shadow: 0 30px 50px rgba(0, 230, 118, 0.6), 0 0 35px rgba(0, 230, 118, 0.5), inset 0 4px 0 rgba(255, 255, 255, 0.3);
             }
             75% {
-              transform: scale(1.05);
-              box-shadow: 0 20px 40px rgba(52, 199, 89, 0.6), 0 0 15px rgba(52, 199, 89, 0.5);
+              transform: scale(1.03);
+              box-shadow: 0 25px 45px rgba(0, 230, 118, 0.5), 0 0 20px rgba(0, 230, 118, 0.4), inset 0 3px 0 rgba(255, 255, 255, 0.25);
             }
           }
 
