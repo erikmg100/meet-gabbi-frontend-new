@@ -142,6 +142,16 @@ export default function Widget() {
       if (retellWebClient) {
         await retellWebClient.stopCall();
       }
+      setCallStatus('Call Ended');
+      setIsCallActive(false);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      setTimeout(() => {
+        setCallStatus('Call Gabbi');
+        setShowMessages(false);
+        setMessages([]);
+      }, 2000);
     } catch (error) {
       console.error('Error stopping call:', error);
     }
@@ -169,6 +179,8 @@ export default function Widget() {
         justifyContent: 'center',
         padding: '20px',
         minHeight: '700px',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
         {        /* iPhone Frame */}
         <div style={{
