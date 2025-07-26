@@ -12,7 +12,7 @@ export default function Widget() {
   const [showMessages, setShowMessages] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const messagesEndRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     // Trigger fade-in animation after component mounts
@@ -139,9 +139,24 @@ export default function Widget() {
 
   const stopCall = async () => {
     try {
-      if (retellWebClient) {
+      console.log('Manually stopping call...');
+      if (retellWebClient && isCallActive) {
         await retellWebClient.stopCall();
+        // Immediately trigger the same logic as call_ended
+        setCallStatus('Call Ended');
+        setIsCallActive(false);
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+        setTimeout(() => {
+          setCallStatus('Call Gabbi');
+          setShowMessages(false);
+          setMessages([]);
+        }, 2000);
       }
+    } catch (error) {
+      console.error('Error stopping call:', error);
+      // Force reset even if there's an error
       setCallStatus('Call Ended');
       setIsCallActive(false);
       if (intervalRef.current) {
@@ -152,8 +167,6 @@ export default function Widget() {
         setShowMessages(false);
         setMessages([]);
       }, 2000);
-    } catch (error) {
-      console.error('Error stopping call:', error);
     }
   };
 
@@ -377,9 +390,11 @@ export default function Widget() {
               /* Call Active Screen */
               <div style={{
                 height: 'calc(100% - 44px)',
+                maxHeight: 'calc(100% - 44px)', // Enforce max height
                 display: 'flex',
                 flexDirection: 'column',
                 background: isCallActive ? 'linear-gradient(180deg, #1c1c1e, #000000)' : '#ffffff',
+                overflow: 'hidden', // Prevent overflow
               }}>
                 {isCallActive && (
                   <>
@@ -455,6 +470,9 @@ export default function Widget() {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '8px',
+                      height: '200px', // Fixed height to prevent page pushing
+                      maxHeight: '200px', // Enforce max height
+                      minHeight: '200px', // Enforce min height
                     }}>
                       {messages.map((message, index) => (
                         <div key={index} style={{
