@@ -185,27 +185,27 @@ export default function Widget() {
     <>
       <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       
-      {/* Fixed positioned container that won't affect page layout */}
+      {/* Container with fixed height - prevents iframe expansion */}
       <div style={{
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        width: '100vw',
-        height: '100vh',
-        pointerEvents: 'none', // Allow clicks to pass through to page content
-        zIndex: 1000,
         fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, sans-serif",
+        background: 'transparent',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '40px 20px 60px 20px',
+        width: '100%',
+        height: '740px', // Fixed height prevents iframe from growing
+        maxHeight: '740px', // Enforce maximum height
+        minHeight: '740px', // Enforce minimum height
+        overflow: 'hidden', // Critical: prevents any content from expanding outside
+        boxSizing: 'border-box',
       }}>
         {/* Centered phone container */}
         <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
           width: '320px',
           height: '640px',
-          pointerEvents: 'auto', // Re-enable pointer events for the phone
           opacity: isLoaded ? 1 : 0,
+          transform: isLoaded ? 'translateY(-10px) scale(1)' : 'translateY(10px) scale(0.95)',
           transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
         }}>
           {/* iPhone Frame */}
