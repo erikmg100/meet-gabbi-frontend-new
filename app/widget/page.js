@@ -200,13 +200,13 @@ export default function Widget() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '20px 20px 60px 20px',
-        height: '700px',
-        maxHeight: '700px',
-        minHeight: '700px',
+        padding: '40px 20px 60px 20px', // Increased top padding from 20px to 40px
+        height: '740px', // Increased height to accommodate larger padding
+        maxHeight: '740px',
+        minHeight: '740px',
         position: 'relative',
-        overflow: 'hidden',
-        boxSizing: 'border-box', // Include padding in height calculation
+        overflow: 'visible', // Changed from hidden to visible to show the phone properly
+        boxSizing: 'border-box',
       }}>
         {/* iPhone Frame */}
         <div style={{
@@ -219,7 +219,7 @@ export default function Widget() {
           position: 'relative',
           border: '2px solid #3a3a3c',
           opacity: isLoaded ? 1 : 0,
-          transform: isLoaded ? 'translateY(-20px) scale(1)' : 'translateY(10px) scale(0.95)',
+          transform: isLoaded ? 'translateY(-10px) scale(1)' : 'translateY(10px) scale(0.95)', // Reduced upward movement
           transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
           flexShrink: 0, // Prevent the phone from shrinking
         }}>
