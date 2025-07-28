@@ -192,6 +192,11 @@ export default function Widget() {
         background: 'transparent',
         pointerEvents: 'auto',
         zIndex: 1,
+        /* Hardware acceleration for smooth rendering */
+        transform: 'translateZ(0)',
+        backfaceVisibility: 'hidden',
+        perspective: '1000px',
+        willChange: 'contents',
       }}>
         
         {/* PHONE POSITIONED ABSOLUTELY WITHIN THE 450x740 CONTAINER */}
@@ -200,12 +205,13 @@ export default function Widget() {
           top: '50%',
           left: '50%',
           transform: isLoaded 
-            ? 'translate(-50%, -50%) translateY(-10px) scale(1)' 
-            : 'translate(-50%, -50%) translateY(10px) scale(0.95)',
+            ? 'translate(-50%, -50%) translateY(-10px) scale(1) translateZ(0)' 
+            : 'translate(-50%, -50%) translateY(10px) scale(0.95) translateZ(0)',
           width: '320px',
           height: '640px',
           opacity: isLoaded ? 1 : 0,
           transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+          backfaceVisibility: 'hidden',
         }}>
           
           {/* iPhone Frame */}
@@ -218,6 +224,8 @@ export default function Widget() {
             boxShadow: '0 35px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
             position: 'relative',
             border: '2px solid #3a3a3c',
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
           }}>
             
             {/* iPhone Screen */}
@@ -228,6 +236,8 @@ export default function Widget() {
               borderRadius: '37px',
               overflow: 'hidden',
               position: 'relative',
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden',
             }}>
               
               {/* Status Bar - FIXED HEIGHT */}
@@ -245,6 +255,8 @@ export default function Widget() {
                 fontSize: '14px',
                 fontWeight: '600',
                 zIndex: 10,
+                transform: 'translateZ(0)',
+                backfaceVisibility: 'hidden',
               }}>
                 <div>9:41</div>
                 <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
@@ -263,6 +275,8 @@ export default function Widget() {
                 bottom: '13px', // Leave space for home indicator
                 overflow: 'hidden',
                 background: isCallActive ? 'linear-gradient(180deg, #1c1c1e, #000000)' : 'transparent',
+                transform: 'translateZ(0)',
+                backfaceVisibility: 'hidden',
               }}>
 
                 {!isCallActive && !showMessages ? (
@@ -279,6 +293,8 @@ export default function Widget() {
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
+                    transform: 'translateZ(0)',
+                    backfaceVisibility: 'hidden',
                   }}>
                     
                     {/* Profile Picture */}
@@ -294,6 +310,8 @@ export default function Widget() {
                       boxShadow: '0 10px 30px rgba(41, 182, 246, 0.3)',
                       border: '4px solid rgba(255, 255, 255, 0.8)',
                       overflow: 'hidden',
+                      transform: 'translateZ(0)',
+                      backfaceVisibility: 'hidden',
                     }}>
                       <img 
                         src="https://storage.googleapis.com/msgsndr/Gyvgsd99IT2dSJS5bwiK/media/6884ce07546316a66b110f2e.jpeg"
@@ -320,6 +338,8 @@ export default function Widget() {
                       letterSpacing: '1px',
                       textTransform: 'uppercase',
                       textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                      transform: 'translateZ(0)',
+                      backfaceVisibility: 'hidden',
                     }}>
                       GABBI
                     </h2>
@@ -332,6 +352,8 @@ export default function Widget() {
                       fontWeight: '500',
                       lineHeight: '1.3',
                       textAlign: 'center',
+                      transform: 'translateZ(0)',
+                      backfaceVisibility: 'hidden',
                     }}>
                       Your Next AI Intake Employee
                     </p>
@@ -353,6 +375,8 @@ export default function Widget() {
                         animation: 'modernCallPulse 3s ease-in-out infinite',
                         position: 'relative',
                         border: '3px solid rgba(255, 255, 255, 0.15)',
+                        transform: 'translateZ(0)',
+                        backfaceVisibility: 'hidden',
                       }}
                     >
                       {/* Glowing rings */}
@@ -365,7 +389,7 @@ export default function Widget() {
                         animation: 'glowRing 2s ease-in-out infinite',
                         top: '50%',
                         left: '50%',
-                        transform: 'translate(-50%, -50%)',
+                        transform: 'translate(-50%, -50%) translateZ(0)',
                         pointerEvents: 'none',
                       }}></div>
                       
@@ -378,7 +402,7 @@ export default function Widget() {
                         animation: 'glowRing 2s ease-in-out infinite 0.5s',
                         top: '50%',
                         left: '50%',
-                        transform: 'translate(-50%, -50%)',
+                        transform: 'translate(-50%, -50%) translateZ(0)',
                         pointerEvents: 'none',
                       }}></div>
 
@@ -393,6 +417,7 @@ export default function Widget() {
                           position: 'relative',
                           zIndex: 2,
                           pointerEvents: 'none',
+                          transform: 'translateZ(0)',
                         }}
                       >
                         <path
@@ -410,6 +435,8 @@ export default function Widget() {
                       letterSpacing: '1px',
                       textShadow: '0 2px 8px rgba(52, 199, 89, 0.3)',
                       animation: 'callTextGlow 2s ease-in-out infinite alternate',
+                      transform: 'translateZ(0)',
+                      backfaceVisibility: 'hidden',
                     }}>
                       {callStatus}
                     </div>
@@ -425,6 +452,8 @@ export default function Widget() {
                     display: 'flex',
                     flexDirection: 'column',
                     overflow: 'hidden',
+                    transform: 'translateZ(0)',
+                    backfaceVisibility: 'hidden',
                   }}>
                     
                     {/* Call Header - FIXED HEIGHT */}
@@ -441,6 +470,8 @@ export default function Widget() {
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      transform: 'translateZ(0)',
+                      backfaceVisibility: 'hidden',
                     }}>
                       <div style={{
                         width: '100px',
@@ -454,6 +485,8 @@ export default function Widget() {
                         animation: 'callPulse 2s ease-in-out infinite',
                         overflow: 'hidden',
                         border: '3px solid rgba(255, 255, 255, 0.3)',
+                        transform: 'translateZ(0)',
+                        backfaceVisibility: 'hidden',
                       }}>
                         <img 
                           src="https://storage.googleapis.com/msgsndr/Gyvgsd99IT2dSJS5bwiK/media/6884ce07546316a66b110f2e.jpeg"
@@ -479,6 +512,8 @@ export default function Widget() {
                         textTransform: 'uppercase',
                         letterSpacing: '1px',
                         textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                        transform: 'translateZ(0)',
+                        backfaceVisibility: 'hidden',
                       }}>
                         GABBI
                       </h3>
@@ -487,6 +522,8 @@ export default function Widget() {
                         fontSize: '16px',
                         color: '#8e8e93',
                         marginBottom: '8px',
+                        transform: 'translateZ(0)',
+                        backfaceVisibility: 'hidden',
                       }}>
                         {callStatus}
                       </div>
@@ -495,32 +532,51 @@ export default function Widget() {
                         fontSize: '18px',
                         color: '#ffffff',
                         fontWeight: '500',
+                        transform: 'translateZ(0)',
+                        backfaceVisibility: 'hidden',
                       }}>
                         {formatTime(callDuration)}
                       </div>
                     </div>
 
-                    {/* Messages During Call - FIXED STRICT HEIGHT (prevents iframe from pushing down) */}
+                    {/* Messages During Call - ANTI-FLICKER OPTIMIZED */}
                     <div style={{
-                      position: 'absolute', /* absolute positioning fixes layout shifts */
-                      top: '220px', /* adjust this value to position properly within your parent */
+                      position: 'absolute',
+                      top: '220px',
                       left: '15px',
                       right: '15px',
-                      height: '180px', /* strictly fixed height prevents growth */
-                      overflowY: 'auto', /* ensures internal scrolling */
+                      height: '180px',
+                      overflowY: 'auto',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '8px',
+                      gap: '6px', // Reduced gap for smoother appearance
                       flexShrink: 0,
                       boxSizing: 'border-box',
+                      /* Anti-flicker hardware acceleration */
+                      transform: 'translateZ(0)',
+                      backfaceVisibility: 'hidden',
+                      perspective: '1000px',
+                      willChange: 'contents',
+                      /* Smooth scrolling */
+                      scrollBehavior: 'smooth',
+                      /* Font optimization */
+                      WebkitFontSmoothing: 'antialiased',
+                      MozOsxFontSmoothing: 'grayscale',
                     }}>
                       {messages.map((message, index) => (
                         <div key={`${message.id || index}-${message.type}-${message.text?.substring(0, 10)}`} style={{
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: message.type === 'user' ? 'flex-end' : 'flex-start',
-                          marginBottom: '8px',
-                          animation: 'messageSlideIn 0.3s ease-out',
+                          marginBottom: '6px', // Reduced margin
+                          /* Minimal animation to prevent flicker */
+                          animation: 'messageSlideIn 0.1s ease-out', 
+                          /* Hardware acceleration */
+                          transform: 'translateZ(0)',
+                          backfaceVisibility: 'hidden',
+                          /* Text optimization */
+                          WebkitFontSmoothing: 'antialiased',
+                          MozOsxFontSmoothing: 'grayscale',
                         }}>
                           <div style={{
                             maxWidth: '80%',
@@ -544,6 +600,11 @@ export default function Widget() {
                             wordWrap: 'break-word',
                             backdropFilter: 'blur(10px)',
                             border: message.type !== 'system' ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+                            /* Anti-flicker for text */
+                            transform: 'translateZ(0)',
+                            backfaceVisibility: 'hidden',
+                            WebkitFontSmoothing: 'antialiased',
+                            MozOsxFontSmoothing: 'grayscale',
                           }}>
                             {message.type === 'gabbi' && (
                               <div style={{
@@ -553,6 +614,8 @@ export default function Widget() {
                                 marginBottom: '2px',
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.5px',
+                                transform: 'translateZ(0)',
+                                backfaceVisibility: 'hidden',
                               }}>
                                 GABBI
                               </div>
@@ -574,6 +637,8 @@ export default function Widget() {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
+                      transform: 'translateZ(0)',
+                      backfaceVisibility: 'hidden',
                     }}>
                       <div 
                         onClick={stopCall}
@@ -589,6 +654,8 @@ export default function Widget() {
                           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                           boxShadow: '0 15px 30px rgba(255, 59, 48, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
                           border: '2px solid rgba(255, 255, 255, 0.15)',
+                          transform: 'translateZ(0)',
+                          backfaceVisibility: 'hidden',
                         }}
                       >
                         <svg
@@ -598,7 +665,7 @@ export default function Widget() {
                           fill="none"
                           style={{
                             filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
-                            transform: 'rotate(135deg)',
+                            transform: 'rotate(135deg) translateZ(0)',
                           }}
                         >
                           <path
@@ -617,11 +684,12 @@ export default function Widget() {
                 position: 'absolute',
                 bottom: '8px',
                 left: '50%',
-                transform: 'translateX(-50%)',
+                transform: 'translateX(-50%) translateZ(0)',
                 width: '134px',
                 height: '5px',
                 background: isCallActive ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
                 borderRadius: '3px',
+                backfaceVisibility: 'hidden',
               }}></div>
             </div>
 
@@ -630,12 +698,13 @@ export default function Widget() {
               position: 'absolute',
               top: '8px',
               left: '50%',
-              transform: 'translateX(-50%)',
+              transform: 'translateX(-50%) translateZ(0)',
               width: '100px',
               height: '25px',
               background: '#000000',
               borderRadius: '0 0 15px 15px',
               zIndex: 100,
+              backfaceVisibility: 'hidden',
             }}></div>
           </div>
         </div>
@@ -644,30 +713,30 @@ export default function Widget() {
       <style jsx>{`
         @keyframes callPulse {
           0%, 100% {
-            transform: scale(1);
+            transform: scale(1) translateZ(0);
             opacity: 1;
           }
           50% {
-            transform: scale(1.05);
+            transform: scale(1.05) translateZ(0);
             opacity: 0.8;
           }
         }
 
         @keyframes modernCallPulse {
           0%, 100% {
-            transform: scale(1);
+            transform: scale(1) translateZ(0);
             box-shadow: 0 20px 40px rgba(0, 230, 118, 0.4), 0 0 0 0 rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2);
           }
           25% {
-            transform: scale(1.03);
+            transform: scale(1.03) translateZ(0);
             box-shadow: 0 25px 45px rgba(0, 230, 118, 0.5), 0 0 20px rgba(0, 230, 118, 0.4), inset 0 3px 0 rgba(255, 255, 255, 0.25);
           }
           50% {
-            transform: scale(1.06);
+            transform: scale(1.06) translateZ(0);
             box-shadow: 0 30px 50px rgba(0, 230, 118, 0.6), 0 0 35px rgba(0, 230, 118, 0.5), inset 0 4px 0 rgba(255, 255, 255, 0.3);
           }
           75% {
-            transform: scale(1.03);
+            transform: scale(1.03) translateZ(0);
             box-shadow: 0 25px 45px rgba(0, 230, 118, 0.5), 0 0 20px rgba(0, 230, 118, 0.4), inset 0 3px 0 rgba(255, 255, 255, 0.25);
           }
         }
@@ -685,15 +754,16 @@ export default function Widget() {
 
         @keyframes messageSlideIn {
           from {
-            opacity: 0;
-            transform: translateY(10px);
+            opacity: 0.8;
+            transform: translateY(2px) translateZ(0);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) translateZ(0);
           }
         }
 
+        /* Optimized scrollbar */
         div::-webkit-scrollbar {
           width: 3px;
         }
@@ -705,6 +775,12 @@ export default function Widget() {
         div::-webkit-scrollbar-thumb {
           background: rgba(255, 255, 255, 0.3);
           border-radius: 3px;
+        }
+
+        /* Global anti-flicker */
+        * {
+          -webkit-font-smoothing: antialiased !important;
+          -moz-osx-font-smoothing: grayscale !important;
         }
       `}</style>
     </>
