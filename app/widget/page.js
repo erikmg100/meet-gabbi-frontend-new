@@ -200,13 +200,17 @@ export default function Widget() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '40px 20px 60px 20px', // Increased top padding from 20px to 40px
-        height: '740px', // Increased height to accommodate larger padding
+        padding: '40px 20px 60px 20px',
+        width: '100%',
+        height: '740px',
         maxHeight: '740px',
         minHeight: '740px',
-        position: 'relative',
-        overflow: 'visible', // Changed from hidden to visible to show the phone properly
+        position: 'absolute', // Changed to absolute positioning
+        top: '0',
+        left: '0',
+        overflow: 'hidden', // Back to hidden to prevent any overflow
         boxSizing: 'border-box',
+        pointerEvents: 'auto', // Ensure interactions work
       }}>
         {/* iPhone Frame */}
         <div style={{
@@ -216,12 +220,17 @@ export default function Widget() {
           borderRadius: '45px',
           padding: '8px',
           boxShadow: '0 35px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-          position: 'relative',
+          position: 'absolute', // Changed to absolute positioning
+          top: '50%',
+          left: '50%',
+          transform: isLoaded 
+            ? 'translate(-50%, -50%) scale(1)' 
+            : 'translate(-50%, -50%) translateY(10px) scale(0.95)',
           border: '2px solid #3a3a3c',
           opacity: isLoaded ? 1 : 0,
-          transform: isLoaded ? 'translateY(-10px) scale(1)' : 'translateY(10px) scale(0.95)', // Reduced upward movement
           transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-          flexShrink: 0, // Prevent the phone from shrinking
+          flexShrink: 0,
+          zIndex: 10, // Ensure it's above other content
         }}>
           {/* iPhone Screen */}
           <div style={{
@@ -480,16 +489,16 @@ export default function Widget() {
 
                     {/* Messages During Call */}
                     <div style={{
-                      flex: 1,
-                      padding: '0 15px',
+                      position: 'absolute', // Changed to absolute positioning
+                      top: '220px', // Fixed position from top
+                      left: '15px',
+                      right: '15px',
+                      bottom: '100px', // Fixed position from bottom
                       overflowY: 'auto',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '8px',
-                      height: '180px', // Fixed height prevents layout shift
-                      maxHeight: '180px',
-                      minHeight: '180px',
-                      position: 'relative', // Ensure proper containment
+                      contain: 'layout style', // CSS containment to prevent layout shifts
                     }}>
                       {messages.map((message, index) => (
                         <div key={index} style={{
