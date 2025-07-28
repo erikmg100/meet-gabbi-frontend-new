@@ -205,12 +205,10 @@ export default function Widget() {
         height: '740px',
         maxHeight: '740px',
         minHeight: '740px',
-        position: 'absolute', // Changed to absolute positioning
-        top: '0',
-        left: '0',
-        overflow: 'hidden', // Back to hidden to prevent any overflow
+        position: 'relative',
+        overflow: 'hidden',
         boxSizing: 'border-box',
-        pointerEvents: 'auto', // Ensure interactions work
+        contain: 'layout style size', // Prevent layout shifts
       }}>
         {/* iPhone Frame */}
         <div style={{
@@ -220,17 +218,13 @@ export default function Widget() {
           borderRadius: '45px',
           padding: '8px',
           boxShadow: '0 35px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-          position: 'absolute', // Changed to absolute positioning
-          top: '50%',
-          left: '50%',
-          transform: isLoaded 
-            ? 'translate(-50%, -50%) scale(1)' 
-            : 'translate(-50%, -50%) translateY(10px) scale(0.95)',
+          position: 'relative',
           border: '2px solid #3a3a3c',
           opacity: isLoaded ? 1 : 0,
+          transform: isLoaded ? 'translateY(-10px) scale(1)' : 'translateY(10px) scale(0.95)',
           transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
           flexShrink: 0,
-          zIndex: 10, // Ensure it's above other content
+          contain: 'layout style', // Isolate this component
         }}>
           {/* iPhone Screen */}
           <div style={{
@@ -417,8 +411,9 @@ export default function Widget() {
                 display: 'flex',
                 flexDirection: 'column',
                 background: isCallActive ? 'linear-gradient(180deg, #1c1c1e, #000000)' : '#ffffff',
-                overflow: 'hidden', // Prevent any overflow
-                position: 'relative', // Establish containing block
+                overflow: 'hidden',
+                position: 'relative',
+                contain: 'layout style size', // Strong containment
               }}>
                 {isCallActive && (
                   <>
@@ -489,16 +484,18 @@ export default function Widget() {
 
                     {/* Messages During Call */}
                     <div style={{
-                      position: 'absolute', // Changed to absolute positioning
-                      top: '220px', // Fixed position from top
-                      left: '15px',
-                      right: '15px',
-                      bottom: '100px', // Fixed position from bottom
+                      flex: 1,
+                      padding: '0 15px',
                       overflowY: 'auto',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '8px',
-                      contain: 'layout style', // CSS containment to prevent layout shifts
+                      height: '180px',
+                      maxHeight: '180px',
+                      minHeight: '180px',
+                      position: 'relative',
+                      contain: 'strict', // Strictest containment to prevent any layout impact
+                      willChange: 'contents', // Optimize for content changes
                     }}>
                       {messages.map((message, index) => (
                         <div key={index} style={{
