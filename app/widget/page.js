@@ -200,26 +200,28 @@ export default function Widget() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '20px',
-        height: '700px', // Fixed container height
-        maxHeight: '700px', // Lock max height
-        minHeight: '700px', // Lock min height
+        padding: '20px 20px 60px 20px',
+        height: '700px',
+        maxHeight: '700px',
+        minHeight: '700px',
         position: 'relative',
         overflow: 'hidden',
+        boxSizing: 'border-box', // Include padding in height calculation
       }}>
-        {        /* iPhone Frame */}
+        {/* iPhone Frame */}
         <div style={{
           width: '320px',
           height: '640px',
           background: 'linear-gradient(145deg, #1c1c1e, #2c2c2e)',
           borderRadius: '45px',
           padding: '8px',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 35px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
           position: 'relative',
           border: '2px solid #3a3a3c',
           opacity: isLoaded ? 1 : 0,
-          transform: isLoaded ? 'translateY(0px) scale(1)' : 'translateY(30px) scale(0.95)',
+          transform: isLoaded ? 'translateY(-20px) scale(1)' : 'translateY(10px) scale(0.95)',
           transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+          flexShrink: 0, // Prevent the phone from shrinking
         }}>
           {/* iPhone Screen */}
           <div style={{
@@ -402,11 +404,12 @@ export default function Widget() {
               /* Call Active Screen */
               <div style={{
                 height: 'calc(100% - 44px)',
-                maxHeight: 'calc(100% - 44px)', // Enforce max height
+                maxHeight: 'calc(100% - 44px)',
                 display: 'flex',
                 flexDirection: 'column',
                 background: isCallActive ? 'linear-gradient(180deg, #1c1c1e, #000000)' : '#ffffff',
-                overflow: 'hidden', // Prevent overflow
+                overflow: 'hidden', // Prevent any overflow
+                position: 'relative', // Establish containing block
               }}>
                 {isCallActive && (
                   <>
@@ -483,9 +486,10 @@ export default function Widget() {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '8px',
-                      height: '180px', // Smaller fixed height
-                      maxHeight: '180px', // Enforce max height
-                      minHeight: '180px', // Enforce min height
+                      height: '180px', // Fixed height prevents layout shift
+                      maxHeight: '180px',
+                      minHeight: '180px',
+                      position: 'relative', // Ensure proper containment
                     }}>
                       {messages.map((message, index) => (
                         <div key={index} style={{
