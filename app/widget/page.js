@@ -16,11 +16,9 @@ export default function Widget() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Trigger fade-in animation after component mounts
     const timer = setTimeout(() => {
       setIsLoaded(true);
     }, 100);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -44,7 +42,6 @@ export default function Widget() {
       setCallDuration(0);
       setMessages([{ type: 'system', text: 'Call connected', timestamp: new Date() }]);
       
-      // Start call timer
       intervalRef.current = setInterval(() => {
         setCallDuration(prev => prev + 1);
       }, 1000);
@@ -143,7 +140,6 @@ export default function Widget() {
       console.log('Manually stopping call...');
       if (retellWebClient && isCallActive) {
         await retellWebClient.stopCall();
-        // Immediately trigger the same logic as call_ended
         setCallStatus('Call Ended');
         setIsCallActive(false);
         if (intervalRef.current) {
@@ -157,7 +153,6 @@ export default function Widget() {
       }
     } catch (error) {
       console.error('Error stopping call:', error);
-      // Force reset even if there's an error
       setCallStatus('Call Ended');
       setIsCallActive(false);
       if (intervalRef.current) {
@@ -177,37 +172,42 @@ export default function Widget() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const formatMessageTime = (date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
   return (
     <>
       <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       
-      {/* Container with fixed height - prevents iframe expansion */}
+      {/* ABSOLUTE POSITIONED ROOT - COMPLETELY ISOLATED FROM PAGE FLOW */}
       <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '450px',
+        height: '740px',
+        maxWidth: '450px',
+        maxHeight: '740px',
+        minWidth: '450px',
+        minHeight: '740px',
+        overflow: 'hidden',
         fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, sans-serif",
         background: 'transparent',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '40px 20px 60px 20px',
-        width: '100%',
-        height: '740px', // Fixed height prevents iframe from growing
-        maxHeight: '740px', // Enforce maximum height
-        minHeight: '740px', // Enforce minimum height
-        overflow: 'hidden', // Critical: prevents any content from expanding outside
-        boxSizing: 'border-box',
+        pointerEvents: 'auto',
+        zIndex: 1,
       }}>
-        {/* Centered phone container */}
+        
+        {/* PHONE POSITIONED ABSOLUTELY WITHIN THE 450x740 CONTAINER */}
         <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: isLoaded 
+            ? 'translate(-50%, -50%) translateY(-10px) scale(1)' 
+            : 'translate(-50%, -50%) translateY(10px) scale(0.95)',
           width: '320px',
           height: '640px',
           opacity: isLoaded ? 1 : 0,
-          transform: isLoaded ? 'translateY(-10px) scale(1)' : 'translateY(10px) scale(0.95)',
           transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
         }}>
+          
           {/* iPhone Frame */}
           <div style={{
             width: '100%',
@@ -219,6 +219,7 @@ export default function Widget() {
             position: 'relative',
             border: '2px solid #3a3a3c',
           }}>
+            
             {/* iPhone Screen */}
             <div style={{
               width: '100%',
@@ -229,18 +230,21 @@ export default function Widget() {
               position: 'relative',
             }}>
               
-              {/* Status Bar */}
+              {/* Status Bar - FIXED HEIGHT */}
               <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
                 height: '44px',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '0 20px',
+                padding: '12px 20px 0 20px',
                 color: isCallActive ? '#ffffff' : '#000000',
                 fontSize: '14px',
                 fontWeight: '600',
-                paddingTop: '12px',
-                flexShrink: 0,
+                zIndex: 10,
               }}>
                 <div>9:41</div>
                 <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
@@ -250,347 +254,365 @@ export default function Widget() {
                 </div>
               </div>
 
-              {!isCallActive && !showMessages ? (
-                /* Contact Screen */
-                <div style={{
-                  padding: '20px',
-                  textAlign: 'center',
-                  height: 'calc(100% - 44px)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                  {/* Profile Picture */}
+              {/* MAIN CONTENT AREA - ABSOLUTE POSITIONED */}
+              <div style={{
+                position: 'absolute',
+                top: '44px',
+                left: 0,
+                right: 0,
+                bottom: '13px', // Leave space for home indicator
+                overflow: 'hidden',
+                background: isCallActive ? 'linear-gradient(180deg, #1c1c1e, #000000)' : 'transparent',
+              }}>
+
+                {!isCallActive && !showMessages ? (
+                  /* Contact Screen - ABSOLUTELY POSITIONED */
                   <div style={{
-                    width: '140px',
-                    height: '140px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #4fc3f7, #29b6f6, #0288d1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '20px',
-                    boxShadow: '0 10px 30px rgba(41, 182, 246, 0.3)',
-                    border: '4px solid rgba(255, 255, 255, 0.8)',
-                    overflow: 'hidden',
-                  }}>
-                    <img 
-                      src="https://storage.googleapis.com/msgsndr/Gyvgsd99IT2dSJS5bwiK/media/6884ce07546316a66b110f2e.jpeg"
-                      alt="Meet Gabbi Logo"
-                      style={{
-                        width: '100px',
-                        height: '100px',
-                        objectFit: 'contain',
-                        borderRadius: '50%',
-                      }}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.parentNode.innerHTML = '<div style="font-size: 60px; color: white;">👩‍⚖️</div>';
-                      }}
-                    />
-                  </div>
-
-                  {/* Contact Name */}
-                  <h2 style={{
-                    fontSize: '36px',
-                    fontWeight: '800',
-                    color: '#000000',
-                    marginBottom: '8px',
-                    letterSpacing: '1px',
-                    textTransform: 'uppercase',
-                    textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                  }}>
-                    GABBI
-                  </h2>
-
-                  {/* Contact Subtitle */}
-                  <p style={{
-                    fontSize: '17px',
-                    color: '#8e8e93',
-                    marginBottom: '50px',
-                    fontWeight: '500',
-                    lineHeight: '1.3',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    padding: '20px',
                     textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}>
-                    Your Next AI Intake Employee
-                  </p>
-
-                  {/* Call Button */}
-                  <div 
-                    onClick={startCall}
-                    style={{
-                      width: '90px',
-                      height: '90px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #00E676, #00C853, #00B248)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      boxShadow: '0 20px 40px rgba(0, 230, 118, 0.4), 0 0 30px rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-                      marginBottom: '25px',
-                      animation: 'modernCallPulse 3s ease-in-out infinite',
-                      position: 'relative',
-                      border: '3px solid rgba(255, 255, 255, 0.15)',
-                    }}
-                  >
-                    {/* Glowing ring animation */}
-                    <div style={{
-                      position: 'absolute',
-                      width: '120px',
-                      height: '120px',
-                      borderRadius: '50%',
-                      border: '2px solid rgba(0, 230, 118, 0.4)',
-                      animation: 'glowRing 2s ease-in-out infinite',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      pointerEvents: 'none',
-                    }}></div>
                     
-                    {/* Second glowing ring */}
+                    {/* Profile Picture */}
                     <div style={{
-                      position: 'absolute',
                       width: '140px',
                       height: '140px',
                       borderRadius: '50%',
-                      border: '1px solid rgba(0, 230, 118, 0.2)',
-                      animation: 'glowRing 2s ease-in-out infinite 0.5s',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      pointerEvents: 'none',
-                    }}></div>
-
-                    {/* Modern phone icon */}
-                    <svg
-                      width="36"
-                      height="36"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      style={{
-                        filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
-                        position: 'relative',
-                        zIndex: 2,
-                        pointerEvents: 'none',
-                      }}
-                    >
-                      <path
-                        d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
-                        fill="white"
-                      />
-                    </svg>
-                  </div>
-
-                  <div style={{
-                    fontSize: '20px',
-                    color: '#34c759',
-                    fontWeight: '700',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px',
-                    textShadow: '0 2px 8px rgba(52, 199, 89, 0.3)',
-                    animation: 'callTextGlow 2s ease-in-out infinite alternate',
-                  }}>
-                    {callStatus}
-                  </div>
-                </div>
-              ) : (
-                /* Call Active Screen */
-                <div style={{
-                  height: 'calc(100% - 44px)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  background: isCallActive ? 'linear-gradient(180deg, #1c1c1e, #000000)' : '#ffffff',
-                  overflow: 'hidden',
-                }}>
-                  {isCallActive && (
-                    <>
-                      {/* Call Header */}
-                      <div style={{
-                        padding: '20px 20px 15px',
-                        textAlign: 'center',
-                        color: '#ffffff',
-                        flexShrink: 0,
-                      }}>
-                        <div style={{
+                      background: 'linear-gradient(135deg, #4fc3f7, #29b6f6, #0288d1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '20px',
+                      boxShadow: '0 10px 30px rgba(41, 182, 246, 0.3)',
+                      border: '4px solid rgba(255, 255, 255, 0.8)',
+                      overflow: 'hidden',
+                    }}>
+                      <img 
+                        src="https://storage.googleapis.com/msgsndr/Gyvgsd99IT2dSJS5bwiK/media/6884ce07546316a66b110f2e.jpeg"
+                        alt="Meet Gabbi Logo"
+                        style={{
                           width: '100px',
                           height: '100px',
+                          objectFit: 'contain',
                           borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #4fc3f7, #29b6f6)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          margin: '0 auto 15px',
-                          animation: 'callPulse 2s ease-in-out infinite',
-                          overflow: 'hidden',
-                          border: '3px solid rgba(255, 255, 255, 0.3)',
-                        }}>
-                          <img 
-                            src="https://storage.googleapis.com/msgsndr/Gyvgsd99IT2dSJS5bwiK/media/6884ce07546316a66b110f2e.jpeg"
-                            alt="Meet Gabbi Logo"
-                            style={{
-                              width: '70px',
-                              height: '70px',
-                              objectFit: 'contain',
-                              borderRadius: '50%',
-                            }}
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.parentNode.innerHTML = '<div style="font-size: 45px; color: white;">👩‍⚖️</div>';
-                            }}
-                          />
-                        </div>
-                        
-                        <h3 style={{
-                          fontSize: '26px',
-                          fontWeight: '800',
-                          marginBottom: '4px',
-                          color: '#ffffff',
-                          textTransform: 'uppercase',
-                          letterSpacing: '1px',
-                          textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-                        }}>
-                          GABBI
-                        </h3>
-                        
-                        <div style={{
-                          fontSize: '16px',
-                          color: '#8e8e93',
-                          marginBottom: '8px',
-                        }}>
-                          {callStatus}
-                        </div>
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.parentNode.innerHTML = '<div style="font-size: 60px; color: white;">👩‍⚖️</div>';
+                        }}
+                      />
+                    </div>
 
-                        <div style={{
-                          fontSize: '18px',
-                          color: '#ffffff',
-                          fontWeight: '500',
-                        }}>
-                          {formatTime(callDuration)}
-                        </div>
-                      </div>
+                    {/* Contact Name */}
+                    <h2 style={{
+                      fontSize: '36px',
+                      fontWeight: '800',
+                      color: '#000000',
+                      marginBottom: '8px',
+                      letterSpacing: '1px',
+                      textTransform: 'uppercase',
+                      textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    }}>
+                      GABBI
+                    </h2>
 
-                      {/* Messages During Call - Fixed dimensions */}
-                      <div style={{
-                        position: 'relative',
-                        height: '180px', // Fixed height
-                        margin: '0 15px',
-                        overflowY: 'auto',
+                    {/* Contact Subtitle */}
+                    <p style={{
+                      fontSize: '17px',
+                      color: '#8e8e93',
+                      marginBottom: '50px',
+                      fontWeight: '500',
+                      lineHeight: '1.3',
+                      textAlign: 'center',
+                    }}>
+                      Your Next AI Intake Employee
+                    </p>
+
+                    {/* Call Button */}
+                    <div 
+                      onClick={startCall}
+                      style={{
+                        width: '90px',
+                        height: '90px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #00E676, #00C853, #00B248)',
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px',
-                        flexShrink: 0, // Don't allow shrinking
-                      }}>
-                        {messages.map((message, index) => (
-                          <div key={index} style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: message.type === 'user' ? 'flex-end' : 'flex-start',
-                            marginBottom: '4px',
-                            animation: 'messageSlideIn 0.3s ease-out',
-                          }}>
-                            <div style={{
-                              maxWidth: '80%',
-                              padding: message.type === 'system' ? '6px 10px' : '8px 12px',
-                              borderRadius: message.type === 'system' 
-                                ? '10px' 
-                                : message.type === 'user' 
-                                  ? '16px 16px 4px 16px' 
-                                  : '16px 16px 16px 4px',
-                              background: message.type === 'system'
-                                ? 'rgba(142, 142, 147, 0.3)'
-                                : message.type === 'user'
-                                  ? '#007AFF'
-                                  : 'rgba(255, 255, 255, 0.15)',
-                              color: message.type === 'system'
-                                ? 'rgba(255, 255, 255, 0.7)'
-                                : '#ffffff',
-                              fontSize: message.type === 'system' ? '11px' : '14px',
-                              fontWeight: '400',
-                              lineHeight: '1.3',
-                              wordWrap: 'break-word',
-                              backdropFilter: 'blur(10px)',
-                              border: message.type !== 'system' ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
-                            }}>
-                              {message.type === 'gabbi' && (
-                                <div style={{
-                                  fontSize: '10px',
-                                  fontWeight: '600',
-                                  color: '#4fc3f7',
-                                  marginBottom: '2px',
-                                  textTransform: 'uppercase',
-                                  letterSpacing: '0.5px',
-                                }}>
-                                  GABBI
-                                </div>
-                              )}
-                              {message.text}
-                            </div>
-                          </div>
-                        ))}
-                        <div ref={messagesEndRef} />
-                      </div>
-
-                      {/* Call Controls */}
-                      <div style={{
-                        padding: '15px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: '60px',
                         alignItems: 'center',
-                        flexShrink: 0,
-                        marginTop: 'auto', // Push to bottom
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxShadow: '0 20px 40px rgba(0, 230, 118, 0.4), 0 0 30px rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+                        marginBottom: '25px',
+                        animation: 'modernCallPulse 3s ease-in-out infinite',
+                        position: 'relative',
+                        border: '3px solid rgba(255, 255, 255, 0.15)',
+                      }}
+                    >
+                      {/* Glowing rings */}
+                      <div style={{
+                        position: 'absolute',
+                        width: '120px',
+                        height: '120px',
+                        borderRadius: '50%',
+                        border: '2px solid rgba(0, 230, 118, 0.4)',
+                        animation: 'glowRing 2s ease-in-out infinite',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        pointerEvents: 'none',
+                      }}></div>
+                      
+                      <div style={{
+                        position: 'absolute',
+                        width: '140px',
+                        height: '140px',
+                        borderRadius: '50%',
+                        border: '1px solid rgba(0, 230, 118, 0.2)',
+                        animation: 'glowRing 2s ease-in-out infinite 0.5s',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        pointerEvents: 'none',
+                      }}></div>
+
+                      {/* Phone icon */}
+                      <svg
+                        width="36"
+                        height="36"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        style={{
+                          filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
+                          position: 'relative',
+                          zIndex: 2,
+                          pointerEvents: 'none',
+                        }}
+                      >
+                        <path
+                          d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                          fill="white"
+                        />
+                      </svg>
+                    </div>
+
+                    <div style={{
+                      fontSize: '20px',
+                      color: '#34c759',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      textShadow: '0 2px 8px rgba(52, 199, 89, 0.3)',
+                      animation: 'callTextGlow 2s ease-in-out infinite alternate',
+                    }}>
+                      {callStatus}
+                    </div>
+                  </div>
+                ) : (
+                  /* Call Active Screen - ABSOLUTELY POSITIONED WITH FIXED LAYOUT */
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                  }}>
+                    
+                    {/* Call Header - FIXED HEIGHT */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '200px', // Fixed height
+                      padding: '20px',
+                      textAlign: 'center',
+                      color: '#ffffff',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      <div style={{
+                        width: '100px',
+                        height: '100px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #4fc3f7, #29b6f6)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: '15px',
+                        animation: 'callPulse 2s ease-in-out infinite',
+                        overflow: 'hidden',
+                        border: '3px solid rgba(255, 255, 255, 0.3)',
                       }}>
-                        {/* End Call Button */}
-                        <div 
-                          onClick={stopCall}
+                        <img 
+                          src="https://storage.googleapis.com/msgsndr/Gyvgsd99IT2dSJS5bwiK/media/6884ce07546316a66b110f2e.jpeg"
+                          alt="Meet Gabbi Logo"
                           style={{
                             width: '70px',
                             height: '70px',
+                            objectFit: 'contain',
                             borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #FF3B30, #FF453A, #D70015)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            boxShadow: '0 15px 30px rgba(255, 59, 48, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-                            border: '2px solid rgba(255, 255, 255, 0.15)',
                           }}
-                          onMouseEnter={(e) => {
-                            e.target.style.transform = 'scale(1.1) translateY(-2px)';
-                            e.target.style.boxShadow = '0 20px 40px rgba(255, 59, 48, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.3)';
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.parentNode.innerHTML = '<div style="font-size: 45px; color: white;">👩‍⚖️</div>';
                           }}
-                          onMouseLeave={(e) => {
-                            e.target.style.transform = 'scale(1) translateY(0px)';
-                            e.target.style.boxShadow = '0 15px 30px rgba(255, 59, 48, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2)';
+                        />
+                      </div>
+                      
+                      <h3 style={{
+                        fontSize: '26px',
+                        fontWeight: '800',
+                        marginBottom: '4px',
+                        color: '#ffffff',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                        textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                      }}>
+                        GABBI
+                      </h3>
+                      
+                      <div style={{
+                        fontSize: '16px',
+                        color: '#8e8e93',
+                        marginBottom: '8px',
+                      }}>
+                        {callStatus}
+                      </div>
+
+                      <div style={{
+                        fontSize: '18px',
+                        color: '#ffffff',
+                        fontWeight: '500',
+                      }}>
+                        {formatTime(callDuration)}
+                      </div>
+                    </div>
+
+                    {/* Messages During Call - FIXED STRICT HEIGHT (prevents iframe from pushing down) */}
+                    <div style={{
+                      position: 'absolute', /* absolute positioning fixes layout shifts */
+                      top: '220px', /* adjust this value to position properly within your parent */
+                      left: '15px',
+                      right: '15px',
+                      height: '180px', /* strictly fixed height prevents growth */
+                      overflowY: 'auto', /* ensures internal scrolling */
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      flexShrink: 0,
+                      boxSizing: 'border-box',
+                    }}>
+                      {messages.map((message, index) => (
+                        <div key={`${message.id || index}-${message.type}-${message.text?.substring(0, 10)}`} style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: message.type === 'user' ? 'flex-end' : 'flex-start',
+                          marginBottom: '8px',
+                          animation: 'messageSlideIn 0.3s ease-out',
+                        }}>
+                          <div style={{
+                            maxWidth: '80%',
+                            padding: message.type === 'system' ? '6px 10px' : '8px 12px',
+                            borderRadius: message.type === 'system' 
+                              ? '10px' 
+                              : message.type === 'user' 
+                                ? '16px 16px 4px 16px' 
+                                : '16px 16px 16px 4px',
+                            background: message.type === 'system'
+                              ? 'rgba(142, 142, 147, 0.3)'
+                              : message.type === 'user'
+                                ? '#007AFF'
+                                : 'rgba(255, 255, 255, 0.15)',
+                            color: message.type === 'system'
+                              ? 'rgba(255, 255, 255, 0.7)'
+                              : '#ffffff',
+                            fontSize: message.type === 'system' ? '11px' : '14px',
+                            fontWeight: '400',
+                            lineHeight: '1.3',
+                            wordWrap: 'break-word',
+                            backdropFilter: 'blur(10px)',
+                            border: message.type !== 'system' ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+                          }}>
+                            {message.type === 'gabbi' && (
+                              <div style={{
+                                fontSize: '10px',
+                                fontWeight: '600',
+                                color: '#4fc3f7',
+                                marginBottom: '2px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px',
+                              }}>
+                                GABBI
+                              </div>
+                            )}
+                            {message.text}
+                          </div>
+                        </div>
+                      ))}
+                      <div ref={messagesEndRef} />
+                    </div>
+
+                    {/* Call Controls - ABSOLUTELY POSITIONED AT BOTTOM */}
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: '100px', // Fixed height
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                      <div 
+                        onClick={stopCall}
+                        style={{
+                          width: '70px',
+                          height: '70px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #FF3B30, #FF453A, #D70015)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          boxShadow: '0 15px 30px rgba(255, 59, 48, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+                          border: '2px solid rgba(255, 255, 255, 0.15)',
+                        }}
+                      >
+                        <svg
+                          width="26"
+                          height="26"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          style={{
+                            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
+                            transform: 'rotate(135deg)',
                           }}
                         >
-                          {/* Modern phone hangup icon */}
-                          <svg
-                            width="26"
-                            height="26"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            style={{
-                              filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
-                              transform: 'rotate(135deg)',
-                            }}
-                          >
-                            <path
-                              d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
-                              fill="white"
-                            />
-                          </svg>
-                        </div>
+                          <path
+                            d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                            fill="white"
+                          />
+                        </svg>
                       </div>
-                    </>
-                  )}
-                </div>
-              )}
+                    </div>
+                  </div>
+                )}
+              </div>
 
-              {/* Home Indicator */}
+              {/* Home Indicator - ABSOLUTELY POSITIONED */}
               <div style={{
                 position: 'absolute',
                 bottom: '8px',
@@ -603,7 +625,7 @@ export default function Widget() {
               }}></div>
             </div>
 
-            {/* iPhone Notch */}
+            {/* iPhone Notch - ABSOLUTELY POSITIONED */}
             <div style={{
               position: 'absolute',
               top: '8px',
@@ -613,7 +635,7 @@ export default function Widget() {
               height: '25px',
               background: '#000000',
               borderRadius: '0 0 15px 15px',
-              zIndex: 10,
+              zIndex: 100,
             }}></div>
           </div>
         </div>
@@ -672,7 +694,6 @@ export default function Widget() {
           }
         }
 
-        /* Custom Scrollbar */
         div::-webkit-scrollbar {
           width: 3px;
         }
