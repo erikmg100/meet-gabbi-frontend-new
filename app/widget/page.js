@@ -139,26 +139,22 @@ export default function Home() {
       </Head>
       <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       
-      {/* CRITICAL: Absolutely positioned container that never changes size */}
       <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '750px', // Exact iframe height
-        maxHeight: '750px',
-        minHeight: '750px',
-        overflow: 'hidden',
         fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
         background: 'linear-gradient(145deg, #e1f5fe, #b3e5fc, #81d4fa, #4fc3f7, #29b6f6)',
         color: '#0277bd',
+        height: '100vh', // FIXED: Set specific viewport height
+        maxHeight: '100vh', // FIXED: Prevent growing beyond viewport
+        minHeight: '100vh', // FIXED: Maintain minimum height
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: isMobile ? '10px' : '20px',
+        overflow: 'hidden',
+        padding: isMobile ? '15px' : '30px',
+        position: 'relative',
         backgroundAttachment: 'fixed',
-        boxSizing: 'border-box',
+        boxSizing: 'border-box', // FIXED: Include padding in height calculation
       }}>
         {/* Subtle Animated Background Overlay */}
         <div style={{
@@ -173,20 +169,20 @@ export default function Home() {
           pointerEvents: 'none',
         }}></div>
 
-        {/* Logo - Smaller for space efficiency */}
+        {/* Logo */}
         <div style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          marginBottom: isMobile ? '15px' : '20px',
+          marginBottom: isMobile ? '30px' : '40px',
           zIndex: 10,
-          flexShrink: 0,
+          flexShrink: 0, // FIXED: Prevent logo from shrinking
         }}>
           <img 
             src="https://cdn-ilclclp.nitrocdn.com/uiuLNoPKqvsktnRsIDyDgFJzxCWoSfSE/assets/images/optimized/rev-1557504/protectingpatientrights.com/wp-content/uploads/2024/11/white-logo-1-1.webp"
             alt="Logo"
             style={{
-              height: isMobile ? '35px' : '45px', // Reduced size
+              height: isMobile ? '45px' : '65px',
               width: 'auto',
               filter: 'drop-shadow(0 4px 12px rgba(2, 119, 189, 0.4))',
               maxWidth: '85%',
@@ -201,53 +197,49 @@ export default function Home() {
           />
         </div>
 
-        {/* Main Content - Absolutely positioned and sized */}
+        {/* Main Content */}
         <div style={{
           display: 'flex',
-          gap: isMobile ? '10px' : '20px',
+          gap: isMobile ? '15px' : '30px',
+          maxWidth: '1400px',
           width: '100%',
-          maxWidth: '420px', // Fit within iframe width
           flexDirection: isMobile ? 'column' : 'row',
           zIndex: 10,
-          position: 'absolute',
-          top: isMobile ? '70px' : '80px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          height: isMobile ? '630px' : '620px', // Fixed remaining height
-          maxHeight: isMobile ? '630px' : '620px',
+          flex: 1, // FIXED: Allow to grow but within constraints
+          minHeight: 0, // FIXED: Allow flexbox shrinking
         }}>
           {/* Audio Sphere Section */}
           <div style={{
-            flex: isMobile ? '0 0 auto' : 1,
+            flex: 1,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'flex-start',
-            padding: isMobile ? '5px' : '10px',
-            height: isMobile ? 'auto' : '100%',
+            justifyContent: 'center',
+            padding: isMobile ? '10px' : '20px',
+            minHeight: 0, // FIXED: Allow flexbox shrinking
           }}>
             <div 
               onClick={isCallActive ? stopCall : startCall}
               style={{
-                width: isMobile ? '120px' : '160px', // Smaller sizes
-                height: isMobile ? '120px' : '160px',
+                width: isMobile ? '150px' : '200px',
+                height: isMobile ? '150px' : '200px',
                 background: 'linear-gradient(135deg, #4fc3f7, #29b6f6, #0288d1)',
                 borderRadius: '50%',
                 position: 'relative',
                 boxShadow: isCallActive 
-                  ? '0 0 40px rgba(41, 182, 246, 0.9), 0 0 80px rgba(79, 195, 247, 0.7)'
-                  : '0 0 25px rgba(41, 182, 246, 0.6), 0 0 50px rgba(79, 195, 247, 0.4)',
+                  ? '0 0 50px rgba(41, 182, 246, 0.9), 0 0 100px rgba(79, 195, 247, 0.7)'
+                  : '0 0 30px rgba(41, 182, 246, 0.6), 0 0 60px rgba(79, 195, 247, 0.4)',
                 cursor: 'pointer',
                 transition: 'all 0.4s ease',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: isMobile ? '1.8rem' : '2.5rem', // Smaller emoji
+                fontSize: isMobile ? '2.2rem' : '3.2rem',
                 animation: isCallActive 
                   ? 'pulse 1.2s infinite ease-in-out' 
                   : 'pulse 2.5s infinite ease-in-out',
                 border: '2px solid rgba(255, 255, 255, 0.3)',
-                flexShrink: 0,
+                flexShrink: 0, // FIXED: Prevent shrinking
               }}
               onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
@@ -258,9 +250,9 @@ export default function Home() {
             <button 
               onClick={isCallActive ? stopCall : startCall}
               style={{
-                marginTop: '15px',
-                padding: isMobile ? '10px 25px' : '12px 35px', // Smaller padding
-                fontSize: isMobile ? '14px' : '16px', // Smaller font
+                marginTop: '25px',
+                padding: isMobile ? '12px 35px' : '15px 50px',
+                fontSize: isMobile ? '16px' : '18px',
                 fontWeight: '700',
                 color: '#ffffff',
                 background: isCallActive 
@@ -271,12 +263,12 @@ export default function Home() {
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 boxShadow: isCallActive
-                  ? '0 4px 15px rgba(244, 67, 54, 0.5)'
-                  : '0 4px 15px rgba(41, 182, 246, 0.5)',
+                  ? '0 6px 20px rgba(244, 67, 54, 0.5)'
+                  : '0 6px 20px rgba(41, 182, 246, 0.5)',
                 fontFamily: "'Manrope', sans-serif",
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                flexShrink: 0,
+                flexShrink: 0, // FIXED: Prevent shrinking
               }}
               onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
@@ -287,32 +279,32 @@ export default function Home() {
             </button>
 
             <div style={{
-              marginTop: '10px',
-              padding: isMobile ? '6px 12px' : '8px 18px', // Smaller padding
+              marginTop: '15px',
+              padding: isMobile ? '8px 15px' : '10px 25px',
               background: 'rgba(255, 255, 255, 0.25)',
               backdropFilter: 'blur(12px)',
               borderRadius: '30px',
-              fontSize: isMobile ? '11px' : '12px', // Smaller font
+              fontSize: isMobile ? '13px' : '14px',
               fontWeight: '600',
               color: '#0277bd',
               textAlign: 'center',
-              minWidth: isMobile ? '150px' : '180px', // Smaller width
+              minWidth: isMobile ? '180px' : '220px',
               border: '1px solid rgba(255, 255, 255, 0.3)',
               transition: 'all 0.3s ease',
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
-              flexShrink: 0,
+              flexShrink: 0, // FIXED: Prevent shrinking
             }}>
               {callStatus}
             </div>
           </div>
 
-          {/* Transcript Section - ABSOLUTELY SIZED */}
+          {/* Transcript Section - FIXED: Added strict height constraints */}
           <div style={{
             flex: 1,
-            height: isMobile ? '350px' : '100%', // Exact height
-            maxHeight: isMobile ? '350px' : '100%',
-            minHeight: isMobile ? '350px' : '100%',
+            height: isMobile ? '350px' : '450px', // FIXED: Set exact height
+            maxHeight: isMobile ? '350px' : '450px', // FIXED: Prevent growing
+            minHeight: isMobile ? '350px' : '450px', // FIXED: Prevent shrinking
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -321,16 +313,15 @@ export default function Home() {
             WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
           }}>
             <h2 style={{
-              fontSize: isMobile ? '16px' : '20px', // Smaller font
+              fontSize: isMobile ? '20px' : '26px',
               fontWeight: '800',
-              marginBottom: '10px',
+              marginBottom: '15px',
               color: '#0277bd',
-              flexShrink: 0,
+              flexShrink: 0, // FIXED: Keep header size fixed
               letterSpacing: '0.5px',
               textTransform: 'uppercase',
               textAlign: 'center',
-              margin: '0 0 10px 0',
-              height: isMobile ? '20px' : '25px', // Fixed height
+              margin: '0 0 15px 0', // FIXED: Remove top margin
             }}>
               LIVE TRANSCRIPT
             </h2>
@@ -339,22 +330,22 @@ export default function Home() {
               ref={transcriptRef}
               style={{
                 fontFamily: "'Manrope', sans-serif",
-                fontSize: isMobile ? '13px' : '14px', // Smaller font
-                lineHeight: '1.5', // Tighter line height
+                fontSize: isMobile ? '15px' : '16px',
+                lineHeight: '1.7',
                 color: '#0277bd',
                 fontWeight: '600',
                 overflowY: 'auto',
                 flex: 1,
-                paddingRight: '6px',
+                paddingRight: '8px',
                 scrollBehavior: 'smooth',
                 letterSpacing: '0.2px',
                 
-                // ABSOLUTELY FIXED HEIGHT
-                height: isMobile ? '310px' : 'calc(100% - 35px)', // Remaining space
-                maxHeight: isMobile ? '310px' : 'calc(100% - 35px)',
-                minHeight: isMobile ? '310px' : 'calc(100% - 35px)',
-                position: 'relative',
-                contain: 'strict', // Strictest containment
+                // CRITICAL FIXES: Strict height management
+                height: isMobile ? '280px' : '380px', // FIXED: Exact height
+                maxHeight: isMobile ? '280px' : '380px', // FIXED: Prevent expansion
+                minHeight: isMobile ? '280px' : '380px', // FIXED: Prevent shrinking
+                position: 'relative', // FIXED: Contain the content
+                contain: 'layout style', // FIXED: CSS containment
               }}
             >
               {transcript ? (
@@ -363,26 +354,26 @@ export default function Home() {
                     <div
                       key={index}
                       style={{
-                        marginBottom: '8px', // Smaller margin
-                        padding: isMobile ? '6px 10px' : '8px 12px', // Smaller padding
-                        borderRadius: '12px',
+                        marginBottom: '10px',
+                        padding: isMobile ? '8px 12px' : '10px 15px',
+                        borderRadius: '15px',
                         background: line.startsWith('👩 Gabbi')
                           ? 'rgba(79, 195, 247, 0.3)'
                           : 'rgba(41, 182, 246, 0.2)',
-                        maxWidth: isMobile ? '95%' : '85%',
+                        maxWidth: isMobile ? '90%' : '80%',
                         alignSelf: line.startsWith('👩 Gabbi') ? 'flex-start' : 'flex-end',
-                        boxShadow: '0 2px 6px rgba(41, 182, 246, 0.2)', // Smaller shadow
+                        boxShadow: '0 2px 8px rgba(41, 182, 246, 0.2)',
                         display: 'inline-block',
                         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                         border: '1px solid rgba(255, 255, 255, 0.3)',
                       }}
                       onMouseEnter={(e) => {
                         e.target.style.transform = 'scale(1.02)';
-                        e.target.style.boxShadow = '0 3px 10px rgba(41, 182, 246, 0.4)';
+                        e.target.style.boxShadow = '0 4px 12px rgba(41, 182, 246, 0.4)';
                       }}
                       onMouseLeave={(e) => {
                         e.target.style.transform = 'scale(1)';
-                        e.target.style.boxShadow = '0 2px 6px rgba(41, 182, 246, 0.2)';
+                        e.target.style.boxShadow = '0 2px 8px rgba(41, 182, 246, 0.2)';
                       }}
                     >
                       {line.startsWith('👩 Gabbi') ? (
@@ -407,8 +398,8 @@ export default function Home() {
                   fontStyle: 'italic',
                   fontWeight: '500',
                   textAlign: 'center',
-                  marginTop: isMobile ? '30px' : '50px',
-                  fontSize: isMobile ? '12px' : '13px', // Smaller font
+                  marginTop: '40px',
+                  fontSize: isMobile ? '14px' : '15px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                 }}>
@@ -419,20 +410,21 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Powered by Text - Fixed position at bottom */}
+        {/* Powered by Text */}
         <div style={{
-          position: 'absolute',
-          bottom: '10px',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: isMobile ? '30px' : '40px',
           zIndex: 10,
+          flexShrink: 0, // FIXED: Prevent shrinking
         }}>
           <div style={{
             fontFamily: "'Manrope', sans-serif",
-            fontSize: isMobile ? '9px' : '11px', // Smaller font
+            fontSize: isMobile ? '11px' : '13px',
             fontWeight: '800',
             color: 'rgba(2, 119, 189, 0.8)',
-            letterSpacing: '2px',
+            letterSpacing: '2.5px',
             textTransform: 'uppercase',
             textAlign: 'center',
             filter: 'drop-shadow(0 2px 6px rgba(41, 182, 246, 0.3))',
@@ -471,7 +463,7 @@ export default function Home() {
           @keyframes fadeIn {
             from {
               opacity: 0;
-              transform: translateY(3px);
+              transform: translateY(5px);
             }
             to {
               opacity: 1;
@@ -481,7 +473,7 @@ export default function Home() {
           
           /* Custom Scrollbar */
           div::-webkit-scrollbar {
-            width: 4px; /* Thinner scrollbar */
+            width: 6px;
           }
           
           div::-webkit-scrollbar-track {
@@ -490,7 +482,7 @@ export default function Home() {
           
           div::-webkit-scrollbar-thumb {
             background: linear-gradient(180deg, #4fc3f7, #29b6f6);
-            border-radius: 8px;
+            border-radius: 12px;
             transition: background 0.3s ease;
           }
           
