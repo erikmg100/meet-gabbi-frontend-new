@@ -143,7 +143,9 @@ export default function Home() {
         fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
         background: 'linear-gradient(145deg, #e1f5fe, #b3e5fc, #81d4fa, #4fc3f7, #29b6f6)',
         color: '#0277bd',
-        minHeight: '100vh',
+        height: '100vh', // FIXED: Set specific viewport height
+        maxHeight: '100vh', // FIXED: Prevent growing beyond viewport
+        minHeight: '100vh', // FIXED: Maintain minimum height
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -152,6 +154,7 @@ export default function Home() {
         padding: isMobile ? '15px' : '30px',
         position: 'relative',
         backgroundAttachment: 'fixed',
+        boxSizing: 'border-box', // FIXED: Include padding in height calculation
       }}>
         {/* Subtle Animated Background Overlay */}
         <div style={{
@@ -173,6 +176,7 @@ export default function Home() {
           alignItems: 'center',
           marginBottom: isMobile ? '30px' : '40px',
           zIndex: 10,
+          flexShrink: 0, // FIXED: Prevent logo from shrinking
         }}>
           <img 
             src="https://cdn-ilclclp.nitrocdn.com/uiuLNoPKqvsktnRsIDyDgFJzxCWoSfSE/assets/images/optimized/rev-1557504/protectingpatientrights.com/wp-content/uploads/2024/11/white-logo-1-1.webp"
@@ -201,6 +205,8 @@ export default function Home() {
           width: '100%',
           flexDirection: isMobile ? 'column' : 'row',
           zIndex: 10,
+          flex: 1, // FIXED: Allow to grow but within constraints
+          minHeight: 0, // FIXED: Allow flexbox shrinking
         }}>
           {/* Audio Sphere Section */}
           <div style={{
@@ -210,6 +216,7 @@ export default function Home() {
             alignItems: 'center',
             justifyContent: 'center',
             padding: isMobile ? '10px' : '20px',
+            minHeight: 0, // FIXED: Allow flexbox shrinking
           }}>
             <div 
               onClick={isCallActive ? stopCall : startCall}
@@ -232,6 +239,7 @@ export default function Home() {
                   ? 'pulse 1.2s infinite ease-in-out' 
                   : 'pulse 2.5s infinite ease-in-out',
                 border: '2px solid rgba(255, 255, 255, 0.3)',
+                flexShrink: 0, // FIXED: Prevent shrinking
               }}
               onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
@@ -260,6 +268,7 @@ export default function Home() {
                 fontFamily: "'Manrope', sans-serif",
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
+                flexShrink: 0, // FIXED: Prevent shrinking
               }}
               onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
@@ -284,15 +293,18 @@ export default function Home() {
               transition: 'all 0.3s ease',
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
+              flexShrink: 0, // FIXED: Prevent shrinking
             }}>
               {callStatus}
             </div>
           </div>
 
-          {/* Transcript Section */}
+          {/* Transcript Section - FIXED: Added strict height constraints */}
           <div style={{
             flex: 1,
-            maxHeight: isMobile ? '300px' : '400px',
+            height: isMobile ? '350px' : '450px', // FIXED: Set exact height
+            maxHeight: isMobile ? '350px' : '450px', // FIXED: Prevent growing
+            minHeight: isMobile ? '350px' : '450px', // FIXED: Prevent shrinking
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -305,10 +317,11 @@ export default function Home() {
               fontWeight: '800',
               marginBottom: '15px',
               color: '#0277bd',
-              flexShrink: 0,
+              flexShrink: 0, // FIXED: Keep header size fixed
               letterSpacing: '0.5px',
               textTransform: 'uppercase',
               textAlign: 'center',
+              margin: '0 0 15px 0', // FIXED: Remove top margin
             }}>
               LIVE TRANSCRIPT
             </h2>
@@ -326,6 +339,13 @@ export default function Home() {
                 paddingRight: '8px',
                 scrollBehavior: 'smooth',
                 letterSpacing: '0.2px',
+                
+                // CRITICAL FIXES: Strict height management
+                height: isMobile ? '280px' : '380px', // FIXED: Exact height
+                maxHeight: isMobile ? '280px' : '380px', // FIXED: Prevent expansion
+                minHeight: isMobile ? '280px' : '380px', // FIXED: Prevent shrinking
+                position: 'relative', // FIXED: Contain the content
+                contain: 'layout style', // FIXED: CSS containment
               }}
             >
               {transcript ? (
@@ -397,6 +417,7 @@ export default function Home() {
           alignItems: 'center',
           marginTop: isMobile ? '30px' : '40px',
           zIndex: 10,
+          flexShrink: 0, // FIXED: Prevent shrinking
         }}>
           <div style={{
             fontFamily: "'Manrope', sans-serif",
