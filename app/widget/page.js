@@ -2,117 +2,125 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { RetellWebClient } from 'retell-client-js-sdk';
+import Head from 'next/head';
 
-export default function Widget() {
+export default function Home() {
   const [isCallActive, setIsCallActive] = useState(false);
-  const [callStatus, setCallStatus] = useState('Call Gabbi');
   const [transcript, setTranscript] = useState('');
+  const [callStatus, setCallStatus] = useState('READY TO CALL');
   const [retellWebClient, setRetellWebClient] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [showMessages, setShowMessages] = useState(false);
-  const [callDuration, setCallDuration] = useState(0);
-  const messagesEndRef = useRef(null);
-  const intervalRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const transcriptRef = useRef(null);
 
+  // CRITICAL: Prevent any scroll behavior
   useEffect(() => {
-    // Trigger fade-in animation after component mounts
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
+    // Lock the body scroll and prevent any auto-scrolling
+    const preventScroll = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
 
-    return () => clearTimeout(timer);
+    // Override all scroll functions
+    const originalScrollTo = window.scrollTo;
+    const originalScrollBy = window.scrollBy;
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
+
+    window.scrollTo = () => {};
+    window.scrollBy = () => {};
+    Element.prototype.scrollIntoView = () => {};
+
+    // Prevent scroll events
+    window.addEventListener('scroll', preventScroll, { passive: false });
+    document.addEventListener('scroll', preventScroll, { passive: false });
+
+    return () => {
+      // Restore original functions
+      window.scrollTo = originalScrollTo;
+      window.scrollBy = originalScrollBy;
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+      
+      window.removeEventListener('scroll', preventScroll);
+      document.removeEventListener('scroll', preventScroll);
+    };
   }, []);
 
   useEffect(() => {
-    // Trigger fade-in animation after component mounts
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
+    setIsMobile(window.innerWidth <= 768);
+    
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
     const client = new RetellWebClient();
     setRetellWebClient(client);
 
     client.on("call_started", () => {
       console.log("call started");
-      setCallStatus('Connected');
+      setCallStatus('CALL ACTIVE - SAY SOMETHING!');
       setIsCallActive(true);
-      setShowMessages(true);
-      setCallDuration(0);
-      setMessages([{ type: 'system', text: 'Call connected', timestamp: new Date() }]);
-      
-      // Start call timer
-      intervalRef.current = setInterval(() => {
-        setCallDuration(prev => prev + 1);
-      }, 1000);
     });
 
     client.on("call_ended", () => {
       console.log("call ended");
-      setCallStatus('Call Ended');
+      setCallStatus('CALL ENDED');
       setIsCallActive(false);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      setTimeout(() => {
-        setCallStatus('Call Gabbi');
-        setShowMessages(false);
-        setMessages([]);
-      }, 3000);
+    });
+
+    client.on("agent_start_talking", () => {
+      console.log("agent started talking");
+    });
+
+    client.on("agent_stop_talking", () => {
+      console.log("agent stopped talking");
     });
 
     client.on("update", (update) => {
       console.log("Received update:", update);
       
-      if (update.transcript && Array.isArray(update.transcript)) {
-        const newMessages = update.transcript.map(item => ({
-          type: item.role === 'agent' ? 'gabbi' : 'user',
-          text: item.content,
-          timestamp: new Date(),
-          id: `${item.role}-${Date.now()}-${Math.random()}`
-        }));
-        setMessages(newMessages);
+      let transcriptText = '';
+      if (update.transcript) {
+        if (typeof update.transcript === 'string') {
+          transcriptText = update.transcript;
+        } else if (Array.isArray(update.transcript)) {
+          transcriptText = update.transcript
+            .map(item => `${item.role === 'agent' ? '👩 Gabbi' : '👤 You'}: ${item.content}`)
+            .join('\n\n');
+        }
+        setTranscript(transcriptText);
       }
     });
 
     client.on("error", (error) => {
       console.error("Retell error:", error);
-      setCallStatus('Call Failed');
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      setTimeout(() => {
-        setCallStatus('Call Gabbi');
-        setShowMessages(false);
-      }, 3000);
+      setCallStatus(`ERROR: ${error.message || 'UNKNOWN ERROR'}`);
     });
 
     return () => {
       client.removeAllListeners();
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
+  useEffect(() => {
+    if (transcriptRef.current) {
+      // Use requestAnimationFrame to ensure smooth scrolling within container only
+      requestAnimationFrame(() => {
+        transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight;
+      });
+    }
+  }, [transcript]);
+
   const startCall = async () => {
     try {
-      setCallStatus('Calling...');
+      setCallStatus('REQUESTING MICROPHONE ACCESS...');
       
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach(track => track.stop());
+      
+      setCallStatus('CREATING CALL...');
       
       const response = await fetch(`https://backendmain-meet-gabbi-site-voice.vercel.app/create-web-call?t=${Date.now()}`, {
         method: 'POST',
@@ -136,547 +144,388 @@ export default function Widget() {
           playbackDeviceId: "default"
         });
       }
+
+      setCallStatus('CALL STARTING...');
     } catch (error) {
       console.error('Error starting call:', error);
       if (error.name === 'NotAllowedError') {
-        setCallStatus('Microphone Access Denied');
+        setCallStatus('MICROPHONE ACCESS DENIED. PLEASE ALLOW MICROPHONE ACCESS AND TRY AGAIN.');
       } else {
-        setCallStatus('Call Failed');
+        setCallStatus(`ERROR: ${error.message}`);
       }
-      setTimeout(() => setCallStatus('Call Gabbi'), 3000);
     }
   };
 
   const stopCall = async () => {
     try {
-      console.log('Manually stopping call...');
-      if (retellWebClient && isCallActive) {
+      if (retellWebClient) {
         await retellWebClient.stopCall();
-        // Immediately trigger the same logic as call_ended
-        setCallStatus('Call Ended');
-        setIsCallActive(false);
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-        setTimeout(() => {
-          setCallStatus('Call Gabbi');
-          setShowMessages(false);
-          setMessages([]);
-        }, 2000);
       }
+      setCallStatus('CALL STOPPED');
+      setIsCallActive(false);
     } catch (error) {
       console.error('Error stopping call:', error);
-      // Force reset even if there's an error
-      setCallStatus('Call Ended');
-      setIsCallActive(false);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      setTimeout(() => {
-        setCallStatus('Call Gabbi');
-        setShowMessages(false);
-        setMessages([]);
-      }, 2000);
     }
-  };
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const formatMessageTime = (date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
     <>
-      <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      <Head>
+        <title>MEET GABBI FOR LAW FIRMS</title>
+      </Head>
+      <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       
+      {/* FIXED CONTAINER - Never changes dimensions */}
       <div style={{
-        fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, sans-serif",
-        background: 'transparent',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px',
-        height: '700px', // Fixed container height
-        maxHeight: '700px', // Lock max height
-        minHeight: '700px', // Lock min height
-        position: 'relative',
+        width: '100vw',
+        height: '100vh',
+        maxWidth: '100vw',
+        maxHeight: '100vh',
+        minWidth: '100vw',
+        minHeight: '100vh',
+        position: 'fixed',
+        top: 0,
+        left: 0,
         overflow: 'hidden',
+        fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+        background: 'linear-gradient(145deg, #e1f5fe, #b3e5fc, #81d4fa, #4fc3f7, #29b6f6)',
+        color: '#0277bd',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '20px',
+        backgroundAttachment: 'fixed',
+        boxSizing: 'border-box',
+        zIndex: 1000,
       }}>
-        {        /* iPhone Frame */}
+        {/* Subtle Animated Background Overlay */}
         <div style={{
-          width: '320px',
-          height: '640px',
-          background: 'linear-gradient(145deg, #1c1c1e, #2c2c2e)',
-          borderRadius: '45px',
-          padding: '8px',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-          position: 'relative',
-          border: '2px solid #3a3a3c',
-          opacity: isLoaded ? 1 : 0,
-          transform: isLoaded ? 'translateY(0px) scale(1)' : 'translateY(30px) scale(0.95)',
-          transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(41, 182, 246, 0.3) 0%, transparent 50%)',
+          animation: 'bgGlow 15s ease-in-out infinite',
+          zIndex: -1,
+          pointerEvents: 'none',
+        }}></div>
+
+        {/* Logo Section - Fixed Height */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '80px',
+          flexShrink: 0,
+          zIndex: 10,
         }}>
-          {/* iPhone Screen */}
+          <img 
+            src="https://cdn-ilclclp.nitrocdn.com/uiuLNoPKqvsktnRsIDyDgFJzxCWoSfSE/assets/images/optimized/rev-1557504/protectingpatientrights.com/wp-content/uploads/2024/11/white-logo-1-1.webp"
+            alt="Logo"
+            style={{
+              height: isMobile ? '40px' : '50px',
+              width: 'auto',
+              filter: 'drop-shadow(0 4px 12px rgba(2, 119, 189, 0.4))',
+              maxWidth: '300px',
+              transition: 'transform 0.3s ease',
+            }}
+            onError={(e) => {
+              console.log('Logo failed to load');
+              e.target.style.display = 'none';
+            }}
+            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+          />
+        </div>
+
+        {/* Main Content - Fixed Height */}
+        <div style={{
+          display: 'flex',
+          gap: isMobile ? '15px' : '30px',
+          width: '100%',
+          maxWidth: '1000px',
+          flexDirection: isMobile ? 'column' : 'row',
+          zIndex: 10,
+          height: isMobile ? 'calc(100vh - 200px)' : 'calc(100vh - 160px)',
+          maxHeight: isMobile ? 'calc(100vh - 200px)' : 'calc(100vh - 160px)',
+          minHeight: isMobile ? 'calc(100vh - 200px)' : 'calc(100vh - 160px)',
+          overflow: 'hidden',
+        }}>
+          {/* Audio Sphere Section - Fixed Width */}
           <div style={{
-            width: '100%',
-            height: '100%',
-            background: isCallActive ? '#000000' : 'linear-gradient(180deg, #f2f2f7, #ffffff)',
-            borderRadius: '37px',
+            flex: isMobile ? '0 0 auto' : '0 0 300px',
+            width: isMobile ? '100%' : '300px',
+            height: isMobile ? '250px' : '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '10px',
             overflow: 'hidden',
-            position: 'relative',
-            opacity: isLoaded ? 1 : 0,
-            transition: 'opacity 0.6s ease 0.3s',
           }}>
-            
-            {/* Status Bar */}
-            <div style={{
-              height: '44px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '0 20px',
-              color: isCallActive ? '#ffffff' : '#000000',
-              fontSize: '14px',
-              fontWeight: '600',
-              paddingTop: '12px',
-            }}>
-              <div>9:41</div>
-              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                <div style={{ width: '18px', height: '10px', border: `1px solid ${isCallActive ? '#ffffff' : '#000000'}`, borderRadius: '2px', position: 'relative' }}>
-                  <div style={{ width: '14px', height: '6px', background: isCallActive ? '#ffffff' : '#000000', borderRadius: '1px', margin: '1px' }}></div>
-                </div>
-              </div>
+            <div 
+              onClick={isCallActive ? stopCall : startCall}
+              style={{
+                width: isMobile ? '120px' : '160px',
+                height: isMobile ? '120px' : '160px',
+                background: 'linear-gradient(135deg, #4fc3f7, #29b6f6, #0288d1)',
+                borderRadius: '50%',
+                position: 'relative',
+                boxShadow: isCallActive 
+                  ? '0 0 40px rgba(41, 182, 246, 0.9), 0 0 80px rgba(79, 195, 247, 0.7)'
+                  : '0 0 25px rgba(41, 182, 246, 0.6), 0 0 50px rgba(79, 195, 247, 0.4)',
+                cursor: 'pointer',
+                transition: 'all 0.4s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: isMobile ? '1.8rem' : '2.5rem',
+                animation: isCallActive 
+                  ? 'pulse 1.2s infinite ease-in-out' 
+                  : 'pulse 2.5s infinite ease-in-out',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+            >
+              🎤
             </div>
 
-            {!isCallActive && !showMessages ? (
-              /* Contact Screen */
-              <div style={{
-                padding: '20px',
-                textAlign: 'center',
-                height: 'calc(100% - 44px)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-                {/* Profile Picture */}
-                <div style={{
-                  width: '140px',
-                  height: '140px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #4fc3f7, #29b6f6, #0288d1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '20px',
-                  boxShadow: '0 10px 30px rgba(41, 182, 246, 0.3)',
-                  border: '4px solid rgba(255, 255, 255, 0.8)',
-                  overflow: 'hidden',
-                }}>
-                  <img 
-                    src="https://storage.googleapis.com/msgsndr/Gyvgsd99IT2dSJS5bwiK/media/6884ce07546316a66b110f2e.jpeg"
-                    alt="Meet Gabbi Logo"
-                    style={{
-                      width: '100px',
-                      height: '100px',
-                      objectFit: 'contain',
-                      borderRadius: '50%',
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.parentNode.innerHTML = '<div style="font-size: 60px; color: white;">👩‍⚖️</div>';
-                    }}
-                  />
-                </div>
+            <button 
+              onClick={isCallActive ? stopCall : startCall}
+              style={{
+                marginTop: '15px',
+                padding: isMobile ? '10px 20px' : '12px 30px',
+                fontSize: isMobile ? '14px' : '16px',
+                fontWeight: '700',
+                color: '#ffffff',
+                background: isCallActive 
+                  ? 'linear-gradient(90deg, #f44336, #d32f2f)'
+                  : 'linear-gradient(90deg, #4fc3f7, #29b6f6)',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: isCallActive
+                  ? '0 4px 15px rgba(244, 67, 54, 0.5)'
+                  : '0 4px 15px rgba(41, 182, 246, 0.5)',
+                fontFamily: "'Manrope', sans-serif",
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+              onMouseDown={(e) => e.target.style.transform = 'scale(0.95)'}
+              onMouseUp={(e) => e.target.style.transform = 'scale(1.05)'}
+            >
+              {isCallActive ? 'END CALL' : 'START CALL'}
+            </button>
 
-                {/* Contact Name */}
-                <h2 style={{
-                  fontSize: '36px',
-                  fontWeight: '800',
-                  color: '#000000',
-                  marginBottom: '8px',
-                  letterSpacing: '1px',
-                  textTransform: 'uppercase',
-                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                }}>
-                  GABBI
-                </h2>
-
-                {/* Contact Subtitle */}
-                <p style={{
-                  fontSize: '17px',
-                  color: '#8e8e93',
-                  marginBottom: '50px',
-                  fontWeight: '500',
-                  lineHeight: '1.3',
-                  textAlign: 'center',
-                }}>
-                  Your Next AI Intake Employee
-                </p>
-
-                {/* Call Button */}
-                <div 
-                  onClick={startCall}
-                  style={{
-                    width: '90px',
-                    height: '90px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #00E676, #00C853, #00B248)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    boxShadow: '0 20px 40px rgba(0, 230, 118, 0.4), 0 0 30px rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-                    marginBottom: '25px',
-                    animation: 'modernCallPulse 3s ease-in-out infinite',
-                    position: 'relative',
-                    border: '3px solid rgba(255, 255, 255, 0.15)',
-                  }}
-                >
-                  {/* Glowing ring animation */}
-                  <div style={{
-                    position: 'absolute',
-                    width: '120px',
-                    height: '120px',
-                    borderRadius: '50%',
-                    border: '2px solid rgba(0, 230, 118, 0.4)',
-                    animation: 'glowRing 2s ease-in-out infinite',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    pointerEvents: 'none',
-                  }}></div>
-                  
-                  {/* Second glowing ring */}
-                  <div style={{
-                    position: 'absolute',
-                    width: '140px',
-                    height: '140px',
-                    borderRadius: '50%',
-                    border: '1px solid rgba(0, 230, 118, 0.2)',
-                    animation: 'glowRing 2s ease-in-out infinite 0.5s',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    pointerEvents: 'none',
-                  }}></div>
-
-                  {/* Modern phone icon */}
-                  <svg
-                    width="36"
-                    height="36"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    style={{
-                      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
-                      position: 'relative',
-                      zIndex: 2,
-                      pointerEvents: 'none',
-                    }}
-                  >
-                    <path
-                      d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
-                      fill="white"
-                    />
-                  </svg>
-                </div>
-
-                <div style={{
-                  fontSize: '20px',
-                  color: '#34c759',
-                  fontWeight: '700',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  textShadow: '0 2px 8px rgba(52, 199, 89, 0.3)',
-                  animation: 'callTextGlow 2s ease-in-out infinite alternate',
-                }}>
-                  {callStatus}
-                </div>
-              </div>
-            ) : (
-              /* Call Active Screen */
-              <div style={{
-                height: 'calc(100% - 44px)',
-                maxHeight: 'calc(100% - 44px)', // Enforce max height
-                display: 'flex',
-                flexDirection: 'column',
-                background: isCallActive ? 'linear-gradient(180deg, #1c1c1e, #000000)' : '#ffffff',
-                overflow: 'hidden', // Prevent overflow
-              }}>
-                {isCallActive && (
-                  <>
-                    {/* Call Header */}
-                    <div style={{
-                      padding: '20px 20px 15px', // Reduced padding
-                      textAlign: 'center',
-                      color: '#ffffff',
-                      flexShrink: 0, // Don't let this shrink
-                    }}>
-                      <div style={{
-                        width: '100px',
-                        height: '100px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #4fc3f7, #29b6f6)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 15px',
-                        animation: 'callPulse 2s ease-in-out infinite',
-                        overflow: 'hidden',
-                        border: '3px solid rgba(255, 255, 255, 0.3)',
-                      }}>
-                        <img 
-                          src="https://storage.googleapis.com/msgsndr/Gyvgsd99IT2dSJS5bwiK/media/6884ce07546316a66b110f2e.jpeg"
-                          alt="Meet Gabbi Logo"
-                          style={{
-                            width: '70px',
-                            height: '70px',
-                            objectFit: 'contain',
-                            borderRadius: '50%',
-                          }}
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.parentNode.innerHTML = '<div style="font-size: 45px; color: white;">👩‍⚖️</div>';
-                          }}
-                        />
-                      </div>
-                      
-                      <h3 style={{
-                        fontSize: '26px',
-                        fontWeight: '800',
-                        marginBottom: '4px',
-                        color: '#ffffff',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-                      }}>
-                        GABBI
-                      </h3>
-                      
-                      <div style={{
-                        fontSize: '16px',
-                        color: '#8e8e93',
-                        marginBottom: '8px',
-                      }}>
-                        {callStatus}
-                      </div>
-
-                      <div style={{
-                        fontSize: '18px',
-                        color: '#ffffff',
-                        fontWeight: '500',
-                      }}>
-                        {formatTime(callDuration)}
-                      </div>
-                    </div>
-
-                    {/* Messages During Call */}
-                    <div style={{
-                      flex: 1,
-                      padding: '0 15px',
-                      overflowY: 'auto',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
-                      height: '180px', // Smaller fixed height
-                      maxHeight: '180px', // Enforce max height
-                      minHeight: '180px', // Enforce min height
-                    }}>
-                      {messages.map((message, index) => (
-                        <div key={index} style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: message.type === 'user' ? 'flex-end' : 'flex-start',
-                          marginBottom: '4px',
-                          animation: 'messageSlideIn 0.3s ease-out',
-                        }}>
-                          <div style={{
-                            maxWidth: '80%',
-                            padding: message.type === 'system' ? '6px 10px' : '8px 12px',
-                            borderRadius: message.type === 'system' 
-                              ? '10px' 
-                              : message.type === 'user' 
-                                ? '16px 16px 4px 16px' 
-                                : '16px 16px 16px 4px',
-                            background: message.type === 'system'
-                              ? 'rgba(142, 142, 147, 0.3)'
-                              : message.type === 'user'
-                                ? '#007AFF'
-                                : 'rgba(255, 255, 255, 0.15)',
-                            color: message.type === 'system'
-                              ? 'rgba(255, 255, 255, 0.7)'
-                              : '#ffffff',
-                            fontSize: message.type === 'system' ? '11px' : '14px',
-                            fontWeight: '400',
-                            lineHeight: '1.3',
-                            wordWrap: 'break-word',
-                            backdropFilter: 'blur(10px)',
-                            border: message.type !== 'system' ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
-                          }}>
-                            {message.type === 'gabbi' && (
-                              <div style={{
-                                fontSize: '10px',
-                                fontWeight: '600',
-                                color: '#4fc3f7',
-                                marginBottom: '2px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px',
-                              }}>
-                                GABBI
-                              </div>
-                            )}
-                            {message.text}
-                          </div>
-                        </div>
-                      ))}
-                      <div ref={messagesEndRef} />
-                    </div>
-
-                    {/* Call Controls */}
-                    <div style={{
-                      padding: '15px', // Reduced padding
-                      display: 'flex',
-                      justifyContent: 'center',
-                      gap: '60px',
-                      alignItems: 'center',
-                      flexShrink: 0, // Don't let this shrink
-                    }}>
-                      {/* End Call Button */}
-                      <div 
-                        onClick={stopCall}
-                        style={{
-                          width: '70px',
-                          height: '70px',
-                          borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #FF3B30, #FF453A, #D70015)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                          boxShadow: '0 15px 30px rgba(255, 59, 48, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
-                          border: '2px solid rgba(255, 255, 255, 0.15)',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.transform = 'scale(1.1) translateY(-2px)';
-                          e.target.style.boxShadow = '0 20px 40px rgba(255, 59, 48, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.3)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.transform = 'scale(1) translateY(0px)';
-                          e.target.style.boxShadow = '0 15px 30px rgba(255, 59, 48, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2)';
-                        }}
-                      >
-                        {/* Modern phone hangup icon */}
-                        <svg
-                          width="26"
-                          height="26"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          style={{
-                            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
-                            transform: 'rotate(135deg)',
-                          }}
-                        >
-                          <path
-                            d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
-                            fill="white"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* Home Indicator */}
             <div style={{
-              position: 'absolute',
-              bottom: '8px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '134px',
-              height: '5px',
-              background: isCallActive ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-              borderRadius: '3px',
-            }}></div>
+              marginTop: '10px',
+              padding: isMobile ? '6px 12px' : '8px 15px',
+              background: 'rgba(255, 255, 255, 0.25)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: '30px',
+              fontSize: isMobile ? '10px' : '12px',
+              fontWeight: '600',
+              color: '#0277bd',
+              textAlign: 'center',
+              width: isMobile ? '200px' : '250px',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              transition: 'all 0.3s ease',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              flexShrink: 0,
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+            }}>
+              {callStatus}
+            </div>
           </div>
 
-          {/* iPhone Notch */}
+          {/* Transcript Section - ABSOLUTELY FIXED DIMENSIONS */}
           <div style={{
-            position: 'absolute',
-            top: '8px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '100px',
-            height: '25px',
-            background: '#000000',
-            borderRadius: '0 0 15px 15px',
-            zIndex: 10,
-          }}></div>
+            flex: 1,
+            height: '100%',
+            maxHeight: '100%',
+            minHeight: '100%',
+            width: isMobile ? '100%' : 'calc(100% - 330px)',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            position: 'relative',
+            maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+          }}>
+            <h2 style={{
+              fontSize: isMobile ? '16px' : '20px',
+              fontWeight: '800',
+              color: '#0277bd',
+              flexShrink: 0,
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              margin: '0 0 15px 0',
+              height: '25px',
+              lineHeight: '25px',
+            }}>
+              LIVE TRANSCRIPT
+            </h2>
+            
+            <div 
+              ref={transcriptRef}
+              style={{
+                fontFamily: "'Manrope', sans-serif",
+                fontSize: isMobile ? '12px' : '14px',
+                lineHeight: '1.4',
+                color: '#0277bd',
+                fontWeight: '600',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                flex: 1,
+                paddingRight: '6px',
+                scrollBehavior: 'smooth',
+                letterSpacing: '0.2px',
+                
+                // CRITICAL: Absolutely fixed height
+                height: 'calc(100% - 40px)',
+                maxHeight: 'calc(100% - 40px)',
+                minHeight: 'calc(100% - 40px)',
+                position: 'relative',
+                contain: 'strict',
+                isolation: 'isolate',
+              }}
+            >
+              {transcript ? (
+                <div style={{ 
+                  animation: 'fadeIn 0.5s ease-in',
+                  height: 'auto',
+                  minHeight: '100%',
+                }}>
+                  {transcript.split('\n\n').map((line, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        marginBottom: '8px',
+                        padding: isMobile ? '6px 8px' : '8px 12px',
+                        borderRadius: '12px',
+                        background: line.startsWith('👩 Gabbi')
+                          ? 'rgba(79, 195, 247, 0.3)'
+                          : 'rgba(41, 182, 246, 0.2)',
+                        maxWidth: '90%',
+                        alignSelf: line.startsWith('👩 Gabbi') ? 'flex-start' : 'flex-end',
+                        boxShadow: '0 2px 6px rgba(41, 182, 246, 0.2)',
+                        display: 'inline-block',
+                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word',
+                      }}
+                    >
+                      {line.startsWith('👩 Gabbi') ? (
+                        <span>
+                          <span style={{ color: '#0288d1', fontWeight: '700' }}>👩 GABBI:</span>
+                          <span style={{ color: '#0277bd' }}>{line.slice(9)}</span>
+                        </span>
+                      ) : line.startsWith('👤 You') ? (
+                        <span>
+                          <span style={{ color: '#4fc3f7', fontWeight: '700' }}>👤 YOU:</span>
+                          <span style={{ color: '#0277bd' }}>{line.slice(7)}</span>
+                        </span>
+                      ) : (
+                        line
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{
+                  color: 'rgba(2, 119, 189, 0.6)',
+                  fontStyle: 'italic',
+                  fontWeight: '500',
+                  textAlign: 'center',
+                  marginTop: '50px',
+                  fontSize: isMobile ? '11px' : '13px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                }}>
+                  YOUR CONVERSATION WILL APPEAR HERE IN REAL-TIME...
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Powered by Text - Fixed Position */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '40px',
+          flexShrink: 0,
+          zIndex: 10,
+        }}>
+          <div style={{
+            fontFamily: "'Manrope', sans-serif",
+            fontSize: isMobile ? '9px' : '11px',
+            fontWeight: '800',
+            color: 'rgba(2, 119, 189, 0.8)',
+            letterSpacing: '2px',
+            textTransform: 'uppercase',
+            textAlign: 'center',
+            filter: 'drop-shadow(0 2px 6px rgba(41, 182, 246, 0.3))',
+            transition: 'color 0.3s ease',
+          }}
+          onMouseEnter={(e) => e.target.style.color = '#0277bd'}
+          onMouseLeave={(e) => e.target.style.color = 'rgba(2, 119, 189, 0.8)'}
+          >
+            POWERED BY MEET GABBI
+          </div>
         </div>
 
         <style jsx>{`
-          @keyframes callPulse {
+          @keyframes pulse {
             0%, 100% {
               transform: scale(1);
+              opacity: 0.85;
+            }
+            50% {
+              transform: scale(1.08);
               opacity: 1;
             }
-            50% {
-              transform: scale(1.05);
-              opacity: 0.8;
-            }
           }
 
-          @keyframes modernCallPulse {
+          @keyframes bgGlow {
             0%, 100% {
+              opacity: 0.3;
               transform: scale(1);
-              box-shadow: 0 20px 40px rgba(0, 230, 118, 0.4), 0 0 0 0 rgba(0, 230, 118, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2);
-            }
-            25% {
-              transform: scale(1.03);
-              box-shadow: 0 25px 45px rgba(0, 230, 118, 0.5), 0 0 20px rgba(0, 230, 118, 0.4), inset 0 3px 0 rgba(255, 255, 255, 0.25);
             }
             50% {
-              transform: scale(1.06);
-              box-shadow: 0 30px 50px rgba(0, 230, 118, 0.6), 0 0 35px rgba(0, 230, 118, 0.5), inset 0 4px 0 rgba(255, 255, 255, 0.3);
-            }
-            75% {
-              transform: scale(1.03);
-              box-shadow: 0 25px 45px rgba(0, 230, 118, 0.5), 0 0 20px rgba(0, 230, 118, 0.4), inset 0 3px 0 rgba(255, 255, 255, 0.25);
+              opacity: 0.5;
+              transform: scale(1.1);
             }
           }
 
-          @keyframes callTextGlow {
-            0% {
-              text-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
-              color: #34c759;
-            }
-            100% {
-              text-shadow: 0 4px 16px rgba(52, 199, 89, 0.6), 0 0 8px rgba(52, 199, 89, 0.4);
-              color: #30d158;
-            }
-          }
-
-          @keyframes messageSlideIn {
+          @keyframes fadeIn {
             from {
               opacity: 0;
-              transform: translateY(10px);
+              transform: translateY(3px);
             }
             to {
               opacity: 1;
               transform: translateY(0);
             }
           }
-
+          
           /* Custom Scrollbar */
           div::-webkit-scrollbar {
-            width: 3px;
+            width: 4px;
           }
           
           div::-webkit-scrollbar-track {
@@ -684,8 +533,23 @@ export default function Widget() {
           }
           
           div::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 3px;
+            background: linear-gradient(180deg, #4fc3f7, #29b6f6);
+            border-radius: 8px;
+            transition: background 0.3s ease;
+          }
+          
+          div::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #29b6f6, #0288d1);
+          }
+
+          /* CRITICAL: Prevent any scroll behavior in the iframe */
+          html, body {
+            overflow: hidden !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            position: fixed !important;
+            width: 100vw !important;
+            max-width: 100vw !important;
           }
         `}</style>
       </div>
